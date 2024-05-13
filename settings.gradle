@@ -1,0 +1,9 @@
+rootProject.name = 'closest'
+include 'module-application-auth'
+include 'module-domain-member'
+include 'module-domain-token'
+include 'module-utility-token'
+include 'module-common-dto'
+include 'module-common-constants'
+include 'module-common-exception'
+

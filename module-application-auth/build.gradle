@@ -1,0 +1,11 @@
+bootJar { enabled = true }
+jar { enabled = false }
+
+dependencies {
+    implementation project(":module-domain-member")
+    implementation project(":module-domain-token")
+    implementation project(":module-utility-token")
+    implementation project(":module-common-dto")
+    implementation project(":module-common-constants")
+    implementation project(":module-common-exception")
+}
