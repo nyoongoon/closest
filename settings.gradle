@@ -1,5 +1,6 @@
 rootProject.name = 'closest'
 include 'module-application-auth'
+include 'module-application-closest'
 include 'module-domain-member'
 include 'module-domain-token'
 include 'module-utility-token'

@@ -14,6 +14,7 @@
         <module name="closest.module-application-auth.main" />
         <module name="closest.module-domain-member.main" />
         <module name="closest.module-common-dto.main" />
+        <module name="closest.module-application-closest.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />

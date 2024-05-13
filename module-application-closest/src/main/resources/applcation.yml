@@ -1,0 +1,21 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  #    defer-datasource-initialization: true # 하이버네이트 초기화 전 쿼리 실행
+
+#logging:
+#  level:
+#    root: trace
+
+
