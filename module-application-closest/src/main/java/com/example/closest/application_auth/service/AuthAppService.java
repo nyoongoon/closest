@@ -36,14 +36,14 @@ public class AuthAppService {
     @Transactional
     public void signup(AuthDto.SignUp signUp) {
         // 존재여부 판단
-        boolean isExists = memberDomain.isMemberExists(signUp.getUsername());
+        boolean isExists = memberDomain.isMemberExists(signUp.getUserEmail());
         if (isExists) {
             throw new DuplicateIdException();
         }
         // 패스워드 암호화
         String encodedPassword = this.passwordEncoder.encode(signUp.getPassword());
         // 엔티티 변환
-        Member member = Member.of(signUp.getUsername(), encodedPassword, signUp.getRoles());
+        Member member = Member.of(signUp.getUserEmail(), encodedPassword, signUp.getRoles());
         // 등록
         memberDomain.regist(member);
     }
@@ -57,7 +57,7 @@ public class AuthAppService {
     @Transactional
     public void signin(AuthDto.SignIn signIn, HttpServletResponse response) {
         //멤버 조회
-        Member member = this.memberDomain.findMemberByUsername(signIn.getUsername());
+        Member member = this.memberDomain.findMemberByUserEmail(signIn.getUserEmail());
         // 패스워드 일치 여부
         boolean isMatches = this.isPasswordMatches(signIn.getPassword(), member.getPassword());
         if (!isMatches) {
@@ -66,7 +66,7 @@ public class AuthAppService {
         // 토큰 Dto 생성
         TokenDto tokenDto = this.tokenProvider.getTokens(member.getUserEmail(), member.getRoles());
         // 리프레시 토큰 엔티티 생성 및 신규 저장
-        Token refreshToken = Token.of(tokenDto.getUsername(), tokenDto.getRefreshToken());
+        Token refreshToken = Token.of(tokenDto.getUserEmail(), tokenDto.getRefreshToken());
         this.tokenDomain.renewalToken(refreshToken);
 
         // 엑세스&리프레시 토큰 쿠키에 저장

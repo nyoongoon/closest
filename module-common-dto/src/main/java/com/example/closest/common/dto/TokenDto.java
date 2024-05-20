@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TokenDto { //TODO Request vs Response 구분
-    private String username;
+    private String userEmail;
     private String accessToken;
     private String refreshToken;
 }

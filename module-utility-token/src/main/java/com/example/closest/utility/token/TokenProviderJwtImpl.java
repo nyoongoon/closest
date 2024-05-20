@@ -77,16 +77,16 @@ public class TokenProviderJwtImpl implements TokenProvider {
 
     // 토큰 발급
     @Override
-    public TokenDto getTokens(String username, List<Authority> roles) {
+    public TokenDto getTokens(String userEmail, List<Authority> roles) {
         // 사용자의 권한정보를 저장하기 위한 클레임 생성
-        Claims claims = Jwts.claims().setSubject(username);
+        Claims claims = Jwts.claims().setSubject(userEmail);
         claims.put(KEY_ROLES, roles); // 클레임은 키밸류
 
         //Access Token & Refresh Token
         String refreshToken = this.getRefreshTokenByClaims(claims);
         String accessToken = this.getAccessTokenByRefreshToken(refreshToken);
 
-        return new TokenDto(username, accessToken, refreshToken);
+        return new TokenDto(userEmail, accessToken, refreshToken);
     }
 
     @Override
@@ -105,8 +105,8 @@ public class TokenProviderJwtImpl implements TokenProvider {
     // 권한 얻기
     @Override
     public Authentication getAuthentication(String token) {
-        String username = this.parseClaims(token, this.accessSecretKey).getSubject();
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+        String userEmail = this.parseClaims(token, this.accessSecretKey).getSubject();
+        UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
         //스프링에서 지원해주는 형태의 토큰 -> 사용자 정보, 사용자 권한 정보
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());

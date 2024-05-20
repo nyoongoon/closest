@@ -3,11 +3,11 @@ package com.example.closest.application_auth.auth.controller;
 import com.example.closest.application_auth.service.AuthAppService;
 import com.example.closest.common.dto.AuthDto.SignIn;
 import com.example.closest.common.dto.AuthDto.SignUp;
-import com.example.closest.domain.member.MemberDomain;
+import com.example.closest.common.exception.Authority;
 import com.example.closest.domain.member.Member;
+import com.example.closest.domain.member.MemberDomain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
-import com.example.closest.common.exception.Authority;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,9 +21,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static com.example.closest.common.exception.Authority.ROLE_READ;
 import static com.example.closest.common.exception.Authority.ROLE_WRITE;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,7 +38,7 @@ class AuthControllerTest {
     private AuthAppService authAppService;
 
     private SignUp signUp = SignUp.builder()
-            .username("abcd")
+            .userEmail("abcd")
             .password("abcd1234")
             .roles(List.of(ROLE_READ, ROLE_WRITE))
             .build();
@@ -53,9 +53,9 @@ class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
 
-        Member member = memberDomain.findMemberByUsername(this.signUp.getUsername());
+        Member member = memberDomain.findMemberByUserEmail(this.signUp.getUserEmail());
 
-        assertThat(this.signUp.getUsername()).isEqualTo(member.getUserEmail());
+        assertThat(this.signUp.getUserEmail()).isEqualTo(member.getUserEmail());
         for (Authority authority : this.signUp.getRoles()) {
             assertThat(member.getRoles().contains(authority)).isTrue();
         }
@@ -66,7 +66,7 @@ class AuthControllerTest {
         authAppService.signup(this.signUp); //가입
 
         SignIn signIn = SignIn.builder()
-                .username(this.signUp.getUsername())
+                .userEmail(this.signUp.getUserEmail())
                 .password(this.signUp.getPassword())
                 .build();
         String json = objectMapper.writeValueAsString(signIn);
@@ -85,7 +85,7 @@ class AuthControllerTest {
         authAppService.signup(this.signUp); //가입
 
         SignIn signIn = SignIn.builder()
-                .username(this.signUp.getUsername())
+                .userEmail(this.signUp.getUserEmail())
                 .password(this.signUp.getPassword())
                 .build();
         String json = objectMapper.writeValueAsString(signIn);
@@ -116,7 +116,7 @@ class AuthControllerTest {
         authAppService.signup(this.signUp); //가입
 
         SignIn signIn = SignIn.builder()
-                .username(this.signUp.getUsername())
+                .userEmail(this.signUp.getUserEmail())
                 .password(this.signUp.getPassword())
                 .build();
         String json = objectMapper.writeValueAsString(signIn);

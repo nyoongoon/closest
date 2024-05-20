@@ -1,4 +1,4 @@
-package com.example.closest.application_auth.dto;
+package com.example.closest.application_auth.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;

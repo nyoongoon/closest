@@ -5,6 +5,6 @@ package com.example.closest.domain.member;
  */
 public interface MemberDomain {
     void regist(Member member);
-    boolean isMemberExists(String username);
-    Member findMemberByUsername(String username);
+    boolean isMemberExists(String userEmail);
+    Member findMemberByUserEmail(String userEmail);
 }

@@ -19,10 +19,10 @@ public class TokenDomainImpl implements TokenDomain {
     @Override
     @Transactional
     public void renewalToken(Token token) {
-        String username = token.getUsername();
-        boolean isExists = tokenRepository.findByUsername(username).isPresent();
-        if (isExists) { // username으로 등록된 리프레시 토큰 존재하면 삭제
-            tokenRepository.deleteByUsername(username);
+        String userEmail = token.getUserEmail();
+        boolean isExists = tokenRepository.findByUserEmail(userEmail).isPresent();
+        if (isExists) { // userEmail으로 등록된 리프레시 토큰 존재하면 삭제
+            tokenRepository.deleteByUserEmail(userEmail);
         }
         // 새로 생성
         tokenRepository.save(token);

@@ -40,10 +40,6 @@ public class Member implements UserDetails {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "member")
     private List<Blog> blogs = new ArrayList<>();
 
-    public void setBlogs(List<Blog> blogs) {
-        this.blogs = blogs;
-    }
-
     @Builder
     public Member(String userEmail, String password, List<Authority> roles) {
         this.userEmail = userEmail;
@@ -52,9 +48,9 @@ public class Member implements UserDetails {
     }
 
 
-    public static Member of(String username, String password, List<Authority> roles) {
+    public static Member of(String userEmail, String password, List<Authority> roles) {
         return Member.builder()
-                .userEmail(username)
+                .userEmail(userEmail)
                 .password(password)
                 .roles(roles)
                 .build();

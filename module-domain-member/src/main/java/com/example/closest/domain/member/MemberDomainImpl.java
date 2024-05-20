@@ -21,9 +21,10 @@ public class MemberDomainImpl implements MemberDomain, UserDetailsService {
     private final MemberRepository memberRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         // Member 엔티티 UserDetails 상속하고 있음..
-        return this.memberRepository.findByUsername(username)
+        // todo UsernameNotFoundException를  IdNotFoundException로 바꾸기..?
+        return this.memberRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 아이디입니다."));
     }
 
@@ -35,14 +36,14 @@ public class MemberDomainImpl implements MemberDomain, UserDetailsService {
     }
 
     @Override
-    public boolean isMemberExists(String username) {
-        Optional<Member> member = this.memberRepository.findByUsername(username);
+    public boolean isMemberExists(String userEmail) {
+        Optional<Member> member = this.memberRepository.findByUserEmail(userEmail);
         return member.isPresent();
     }
 
     @Override
-    public Member findMemberByUsername(String username) {
-        return this.memberRepository.findByUsername(username)
+    public Member findMemberByUserEmail(String userEmail) {
+        return this.memberRepository.findByUserEmail(userEmail)
                 .orElseThrow(()-> new IdNotFoundException());
     }
 }

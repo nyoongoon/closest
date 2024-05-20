@@ -17,19 +17,19 @@ public class Token {
     private Long id;
 
     @Column(unique = true)
-    private String username; //TODO 외래키?
+    private String userEmail; //TODO 외래키?
 
     private String tokenValue;
 
     @Builder
-    public Token(String username, String tokenValue) {
-        this.username = username;
+    public Token(String userEmail, String tokenValue) {
+        this.userEmail = userEmail;
         this.tokenValue = tokenValue;
     }
 
-    public static Token of(String username, String tokenValue){
+    public static Token of(String userEmail, String tokenValue){
         return Token.builder()
-                .username(username)
+                .userEmail(userEmail)
                 .tokenValue(tokenValue)
                 .build();
     }

@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface TokenProvider {
     // 토큰 발급
-    TokenDto getTokens(String username, List<Authority> roles);
+    TokenDto getTokens(String userEmail, List<Authority> roles);
 
     String getRefreshTokenByClaims(Claims claims);
 
