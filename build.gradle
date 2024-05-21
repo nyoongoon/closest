@@ -32,6 +32,7 @@ subprojects {
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         //security
         implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.security:spring-security-test'
         //jwt
         implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
         //jwt -> java11 이상 javax.xml.bind.DatatypeConverter 의존성 이슈
@@ -51,6 +52,11 @@ subprojects {
     tasks.named('test') {
         useJUnitPlatform()
     }
-
 }
 
+bootJar {
+    enabled = false
+}
+jar {
+    enabled = true
+}

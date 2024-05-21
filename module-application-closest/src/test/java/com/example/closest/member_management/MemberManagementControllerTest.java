@@ -1,5 +1,6 @@
 package com.example.closest.member_management;
 
+import com.example.closest.config.MockUser;
 import com.example.closest.domain.member.Member;
 import com.example.closest.domain.member.MemberDomainImpl;
 import com.example.closest.member_management.request.AddBlogRequest;

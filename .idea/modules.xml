@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-application-closest/closest.module-application-closest.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-application-closest/closest.module-application-closest.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-common-constants/closest.module-common-constants.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-common-constants/closest.module-common-constants.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-common-dto/closest.module-common-dto.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-common-dto/closest.module-common-dto.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-common-exception/closest.module-common-exception.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-common-exception/closest.module-common-exception.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-domain-member/closest.module-domain-member.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-domain-member/closest.module-domain-member.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-domain-token/closest.module-domain-token.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-domain-token/closest.module-domain-token.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/module-utility-token/closest.module-utility-token.main.iml" filepath="$PROJECT_DIR$/.idea/modules/module-utility-token/closest.module-utility-token.main.iml" />
+    </modules>
+  </component>
+</project>
