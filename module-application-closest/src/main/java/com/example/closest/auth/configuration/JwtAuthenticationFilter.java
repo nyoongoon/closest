@@ -1,4 +1,4 @@
-package com.example.closest.application_auth.configuration;
+package com.example.closest.auth.configuration;
 
 import com.example.closest.common.exception.auth.TokenExpiredException;
 import com.example.closest.utility.token.TokenProvider;

@@ -1,6 +1,6 @@
-package com.example.closest.application_auth.auth.controller;
+package com.example.closest.auth.controller;
 
-import com.example.closest.application_auth.service.AuthAppService;
+import com.example.closest.auth.service.AuthAppService;
 import com.example.closest.common.dto.AuthDto.SignIn;
 import com.example.closest.common.dto.AuthDto.SignUp;
 import com.example.closest.common.exception.Authority;

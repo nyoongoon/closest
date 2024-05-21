@@ -1,4 +1,4 @@
-package com.example.closest.application_auth.controller;
+package com.example.closest.auth.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;

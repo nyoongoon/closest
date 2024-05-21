@@ -1,6 +1,6 @@
-package com.example.closest.application_auth.controller;
+package com.example.closest.auth.controller;
 
-import com.example.closest.application_auth.response.ErrorResponse;
+import com.example.closest.auth.response.ErrorResponse;
 import com.example.closest.common.exception.AuthException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

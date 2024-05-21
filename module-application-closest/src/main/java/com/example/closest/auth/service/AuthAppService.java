@@ -1,4 +1,4 @@
-package com.example.closest.application_auth.service;
+package com.example.closest.auth.service;
 
 import com.example.closest.common.dto.AuthDto;
 import com.example.closest.common.dto.TokenDto;

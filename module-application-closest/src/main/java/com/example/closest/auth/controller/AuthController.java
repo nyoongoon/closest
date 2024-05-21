@@ -1,6 +1,6 @@
-package com.example.closest.application_auth.controller;
+package com.example.closest.auth.controller;
 
-import com.example.closest.application_auth.service.AuthAppService;
+import com.example.closest.auth.service.AuthAppService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

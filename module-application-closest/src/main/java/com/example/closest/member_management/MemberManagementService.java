@@ -21,6 +21,5 @@ public class MemberManagementService {
                 .link(blogLink)
                 .build();
         blog.setMember(member);
-
     }
 }

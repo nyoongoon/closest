@@ -1,4 +1,4 @@
-package com.example.closest.application_auth.configuration;
+package com.example.closest.auth.configuration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
