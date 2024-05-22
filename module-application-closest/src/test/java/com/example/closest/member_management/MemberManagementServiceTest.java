@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class MemberManagementServiceTest {
@@ -32,7 +31,7 @@ class MemberManagementServiceTest {
 
         // when
         String link = "https://goalinnext.tistory.com";
-        memberManagementService.addBlog(userEmail, link);
+        memberManagementService.userSubscriptsBlog(userEmail, link);
 
         // then
         Member found = memberDomain.findMemberByUserEmail(userEmail);

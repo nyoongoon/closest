@@ -10,6 +10,9 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 
 import java.util.List;
 
+/**
+ * 테스트용 스프링 시큐리티 컨텍스트에 Authentication 추가
+ */
 public class MockSecurityContext implements WithSecurityContextFactory<MockUser> {
     private final MemberDomain memberDomain;
 
@@ -26,7 +29,7 @@ public class MockSecurityContext implements WithSecurityContextFactory<MockUser>
         memberDomain.regist(member);
 
 
-        var role = new SimpleGrantedAuthority("ROLE_ADMIN");
+        var role = new SimpleGrantedAuthority("ROLE_WRITE");
         var auth = new UsernamePasswordAuthenticationToken(
                 member,
                 member.getPassword(),

@@ -1,5 +1,6 @@
 package com.example.closest.domain.member;
 
+import com.example.closest.domain.Subscription.Subscription;
 import com.example.closest.domain.blog.Blog;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -37,8 +38,8 @@ public class Member implements UserDetails {
 
     private List<Authority> roles = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "member")
-    private List<Blog> blogs = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     @Builder
     public Member(String userEmail, String password, List<Authority> roles) {

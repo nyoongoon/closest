@@ -38,9 +38,6 @@ subprojects {
         //jwt -> java11 이상 javax.xml.bind.DatatypeConverter 의존성 이슈
         implementation 'javax.xml.bind:jaxb-api:2.3.0'
 
-        //lombok
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
         //h2
         runtimeOnly 'com.h2database:h2' //http://localhost:8080/h2-console
 

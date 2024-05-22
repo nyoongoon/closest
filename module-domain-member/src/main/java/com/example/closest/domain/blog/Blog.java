@@ -1,11 +1,14 @@
 package com.example.closest.domain.blog;
 
-import com.example.closest.domain.member.Member;
+import com.example.closest.domain.Subscription.Subscription;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -18,20 +21,12 @@ public class Blog {
 
     private String link;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     @Builder
     public Blog(String link) {
         this.link = link;
     }
 
-    public void setMember(Member member) {
-        if (this.member != null) {
-            this.member.getBlogs().remove(this);
-        }
-        this.member = member;
-        member.getBlogs().add(this);
-    }
 }

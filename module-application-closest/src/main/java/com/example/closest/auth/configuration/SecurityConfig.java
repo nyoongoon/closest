@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * 시큐리티 설정
@@ -27,6 +28,28 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    /**
+     * 시큐리티 무시 옵션 설정
+     * - WebSecurityCustomizer
+     *
+     * @return
+     */
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {  //아래의 filterChain 에서도 관리 가능
+        return web -> web.ignoring()
+                .requestMatchers("/favicon")
+                .requestMatchers("/error")
+                .requestMatchers(new AntPathRequestMatcher("/h2-console/**"));
+    }
+
+    /**
+     * 경로에 대한 권한 허용 설정, 로그인 설정
+     * - SecurityFilterChain
+     *
+     * @param http
+     * @return
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -35,20 +58,13 @@ public class SecurityConfig {
                 .sessionManagement(configurer -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  //jwt는 세션을 갖지 않음
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/auth/signup", "/auth/signin").permitAll()// 아래의 web.ignoring()에서도 관리 가능
-                        .anyRequest().authenticated()) // --> 이슈해결 이것 없으면 PreAuthorize 적용 안됐음
+                        .anyRequest().permitAll()) // --> 이슈해결 이것 없으면 PreAuthorize 적용 안됐음
                 .addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        // antMatchers 부분도 deprecated 되어 requestMatchers로 대체
-        return web -> web.ignoring()
-                .requestMatchers("/h2-console/**");
-    }
 
     @Bean
     AuthenticationManager authenticationManager(

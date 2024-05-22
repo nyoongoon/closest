@@ -14,7 +14,6 @@ import java.util.Optional;
 /**
  * Member 도메인 서비스 구현 클래스
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemberDomainImpl implements MemberDomain, UserDetailsService {
