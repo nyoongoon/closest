@@ -34,7 +34,7 @@ class MemberManagementControllerTest {
     void test1() throws Exception {
         // given
         String userEmail = "abc@naver.com";
-        Member member = Member.builder()
+        Member member = new Member.Builder()
                 .userEmail(userEmail)
                 .password("1234")
                 .build();

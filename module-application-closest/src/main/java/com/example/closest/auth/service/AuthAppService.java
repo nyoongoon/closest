@@ -9,8 +9,6 @@ import com.example.closest.domain.token.TokenDomain;
 import com.example.closest.domain.token.entity.Token;
 import com.example.closest.utility.token.TokenProvider;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 인증 서비스 클래스
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class AuthAppService {
 
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder; //todo 도메인 영역으로 옮길 수 있을지?
     private final MemberDomain memberDomain;
     private final TokenDomain tokenDomain;
+
+    public AuthAppService(TokenProvider tokenProvider, PasswordEncoder passwordEncoder, MemberDomain memberDomain, TokenDomain tokenDomain) {
+        this.tokenProvider = tokenProvider;
+        this.passwordEncoder = passwordEncoder;
+        this.memberDomain = memberDomain;
+        this.tokenDomain = tokenDomain;
+    }
 
     /**
      * 가입 서비스 로직

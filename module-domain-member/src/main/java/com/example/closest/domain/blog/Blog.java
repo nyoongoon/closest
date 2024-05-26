@@ -2,18 +2,12 @@ package com.example.closest.domain.blog;
 
 import com.example.closest.domain.Subscription.Subscription;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
 @Entity
 @Table(name = "blog")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +18,17 @@ public class Blog {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
     private List<Subscription> subscriptions = new ArrayList<>();
 
-    @Builder
+    protected Blog(){}
+
     public Blog(String link) {
         this.link = link;
     }
 
+    public String getLink() {
+        return link;
+    }
+
+    public List<Subscription> getSubscriptions() {
+        return subscriptions;
+    }
 }

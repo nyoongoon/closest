@@ -2,8 +2,6 @@ package com.example.closest.auth.controller;
 
 import com.example.closest.auth.service.AuthAppService;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import com.example.closest.common.dto.AuthDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,12 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor
 public class AuthController {
     private final AuthAppService authAppService;
+
+    public AuthController(AuthAppService authAppService) {
+        this.authAppService = authAppService;
+    }
 
     /**
      * 회원가입

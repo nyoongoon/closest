@@ -1,8 +1,6 @@
 package com.example.closest.common.dto;
 
 import com.example.closest.common.exception.Authority;
-import lombok.Builder;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -10,31 +8,97 @@ import java.util.List;
  * 인증 Dto
  */
 public class AuthDto { //TODO Request vs Response 구분
-    @Getter
     public static class SignIn {
         private String userEmail;
         private String password;
 
-        @Builder
-        public SignIn(String userEmail, String password) {
-            this.userEmail = userEmail;
-            this.password = password;
+        private SignIn(Builder builder) {
+            this.userEmail = builder.userEmail;
+            this.password = builder.password;
         }
+
+        public String getUserEmail() {
+            return userEmail;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public static final class Builder {
+            private String userEmail;
+            private String password;
+
+            public Builder() {
+            }
+
+            public Builder userEmail(String userEmail) {
+                this.userEmail = userEmail;
+                return this;
+            }
+
+            public Builder password(String password) {
+                this.password = password;
+                return this;
+            }
+
+            public SignIn build(){
+                return new SignIn(this);
+            }
+        }
+
     }
 
-    @Getter
     public static class SignUp {
         private String userEmail;
         private String password;
         private List<Authority> roles;
 
-        @Builder
-        public SignUp(String userEmail, String password, List<Authority> roles) {
-            this.userEmail = userEmail;
-            this.password = password;
-            this.roles = roles;
+        private SignUp(Builder builder) {
+            this.userEmail = builder.userEmail;
+            this.password = builder.password;
+            this.roles = builder.roles;
         }
 
+        public String getUserEmail() {
+            return userEmail;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public List<Authority> getRoles() {
+            return roles;
+        }
+
+        public static final class Builder {
+            private String userEmail;
+            private String password;
+            private List<Authority> roles;
+
+            public Builder() {
+            }
+
+            public Builder userEmail(String userEmail) {
+                this.userEmail = userEmail;
+                return this;
+            }
+
+            public Builder password(String password) {
+                this.password = password;
+                return this;
+            }
+
+            public Builder roles(List<Authority> roles) {
+                this.roles = roles;
+                return this;
+            }
+
+            public SignUp build() {
+                return new SignUp(this);
+            }
+        }
 
     }
 }

@@ -1,8 +1,6 @@
 package com.example.closest.domain.member;
 
 import com.example.closest.common.exception.auth.IdNotFoundException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,9 +13,12 @@ import java.util.Optional;
  * Member 도메인 서비스 구현 클래스
  */
 @Service
-@RequiredArgsConstructor
 public class MemberDomainImpl implements MemberDomain, UserDetailsService {
     private final MemberRepository memberRepository;
+
+    public MemberDomainImpl(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {

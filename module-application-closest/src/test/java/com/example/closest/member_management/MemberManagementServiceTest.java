@@ -23,7 +23,7 @@ class MemberManagementServiceTest {
     void test1() {
         // given
         String userEmail = "abc@naver.com";
-        Member member = Member.builder()
+        Member member = new Member.Builder()
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
@@ -35,7 +35,7 @@ class MemberManagementServiceTest {
 
         // then
         Member found = memberDomain.findMemberByUserEmail(userEmail);
-        assertThat(found.getBlogs().size()).isEqualTo(1);
-        assertThat(found.getBlogs().get(0).getLink()).isEqualTo(link);
+
+        assertThat(true).isFalse(); //테스트 코드 다시 작성 member-blog-subscription관계
     }
 }

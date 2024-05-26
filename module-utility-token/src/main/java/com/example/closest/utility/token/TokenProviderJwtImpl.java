@@ -7,7 +7,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import com.example.closest.common.exception.Authority;
 import com.example.closest.common.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,6 @@ import java.util.List;
  * 토큰 구현 클래스 - Jwt 토큰
  */
 @Component
-@RequiredArgsConstructor
 public class TokenProviderJwtImpl implements TokenProvider {
     // Http 프로토콜에서 헤더에 포함 되는데, 어떤 key에 토큰을 줄건지 설정
     private static final String TOKEN_HEADER = "Authorization";
@@ -44,6 +42,9 @@ public class TokenProviderJwtImpl implements TokenProvider {
     @Value("{spring.jwt.refresh-secret-key}")
     private String refreshSecretKey;
 
+    public TokenProviderJwtImpl(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     /**
      * 토큰 생성

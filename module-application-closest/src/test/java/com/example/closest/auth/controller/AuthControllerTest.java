@@ -37,11 +37,12 @@ class AuthControllerTest {
     @Autowired
     private AuthAppService authAppService;
 
-    private SignUp signUp = SignUp.builder()
+    private SignUp signUp = new SignUp.Builder()
             .userEmail("abcd")
             .password("abcd1234")
             .roles(List.of(ROLE_READ, ROLE_WRITE))
             .build();
+
 
     @Test
     void 회원가입_테스트() throws Exception {
@@ -65,7 +66,7 @@ class AuthControllerTest {
     void 로그인_테스트() throws Exception {
         authAppService.signup(this.signUp); //가입
 
-        SignIn signIn = SignIn.builder()
+        SignIn signIn = new SignIn.Builder()
                 .userEmail(this.signUp.getUserEmail())
                 .password(this.signUp.getPassword())
                 .build();
@@ -84,7 +85,7 @@ class AuthControllerTest {
     void 엑세스_토큰_인증_테스트() throws Exception {
         authAppService.signup(this.signUp); //가입
 
-        SignIn signIn = SignIn.builder()
+        SignIn signIn = new SignIn.Builder()
                 .userEmail(this.signUp.getUserEmail())
                 .password(this.signUp.getPassword())
                 .build();
@@ -115,7 +116,7 @@ class AuthControllerTest {
     void 리프레시_토큰_인증_테스트() throws Exception {
         authAppService.signup(this.signUp); //가입
 
-        SignIn signIn = SignIn.builder()
+        SignIn signIn = new SignIn.Builder()
                 .userEmail(this.signUp.getUserEmail())
                 .password(this.signUp.getPassword())
                 .build();

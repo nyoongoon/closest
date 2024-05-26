@@ -1,20 +1,19 @@
 package com.example.closest.domain.token;
 
 import com.example.closest.domain.token.entity.Token;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 토큰 도메인 서비스 구현 클래스
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class TokenDomainImpl implements TokenDomain {
-
     private final TokenRepository tokenRepository;
+
+    public TokenDomainImpl(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
     @Override
     @Transactional
