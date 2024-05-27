@@ -1,10 +1,12 @@
 package com.example.closest.member_management;
 
+import com.example.closest.domain.blog.BlogDomain;
 import com.example.closest.domain.member.Member;
 import com.example.closest.domain.member.MemberDomain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,9 @@ class MemberManagementServiceTest {
     private MemberDomain memberDomain;
     @Autowired
     private MemberManagementService memberManagementService;
+    @Qualifier("blogDomain")
+    @Autowired
+    private BlogDomain blogDomain;
 
     @Test
     @DisplayName("블로그 엔티티 등록하고 멤버 연관관계 맺는다")
@@ -28,14 +33,10 @@ class MemberManagementServiceTest {
                 .password("1234")
                 .build();
         memberDomain.regist(member);
-
-        // when
         String link = "https://goalinnext.tistory.com";
+        // when
         memberManagementService.userSubscriptsBlog(userEmail, link);
-
         // then
-        Member found = memberDomain.findMemberByUserEmail(userEmail);
-
-        assertThat(true).isFalse(); //테스트 코드 다시 작성 member-blog-subscription관계
+        assertThat(member.getSubscriptions().get(0).getBlog().getLink()).isEqualTo(link);
     }
 }

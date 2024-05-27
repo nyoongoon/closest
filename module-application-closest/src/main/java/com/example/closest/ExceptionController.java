@@ -1,4 +1,4 @@
-package com.example.closest.auth.controller;
+package com.example.closest;
 
 import com.example.closest.auth.response.ErrorResponse;
 import com.example.closest.common.exception.AuthException;
@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ResponseBody
 @ControllerAdvice
 public class ExceptionController {
-    @ExceptionHandler(AuthException.class)
+    @ExceptionHandler({AuthException.class})
     public ResponseEntity<ErrorResponse> authException(AuthException e) {
-
 
         int statusCode = e.getStatusCode();
 

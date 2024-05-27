@@ -7,7 +7,9 @@ import com.example.closest.common.exception.Authority;
 import com.example.closest.domain.member.Member;
 import com.example.closest.domain.member.MemberDomain;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.http.Cookie;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,8 +46,8 @@ class AuthControllerTest {
             .roles(List.of(ROLE_READ, ROLE_WRITE))
             .build();
 
-
     @Test
+    @Transactional
     void 회원가입_테스트() throws Exception {
         String json = objectMapper.writeValueAsString(this.signUp);
 
@@ -63,6 +66,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @Transactional
     void 로그인_테스트() throws Exception {
         authAppService.signup(this.signUp); //가입
 
@@ -82,6 +86,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @Transactional
     void 엑세스_토큰_인증_테스트() throws Exception {
         authAppService.signup(this.signUp); //가입
 
@@ -104,15 +109,18 @@ class AuthControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andDo(MockMvcResultHandlers.print());
 
-        accessToken = accessToken.substring(1);
-        mockMvc.perform(MockMvcRequestBuilders.get("/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", "Bearer " + accessToken))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+        String manipulated = accessToken.substring(0, accessToken.length() - 1); //조작된 토큰
+        Assertions.assertThrows(SignatureException.class, () -> {
+            mockMvc.perform(MockMvcRequestBuilders.get("/")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + manipulated))
+                    .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                    .andDo(MockMvcResultHandlers.print());
+        });
     }
 
     @Test
+    @Transactional
     void 리프레시_토큰_인증_테스트() throws Exception {
         authAppService.signup(this.signUp); //가입
 

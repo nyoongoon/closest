@@ -1,5 +1,6 @@
 package com.example.closest.member_management;
 
+import com.example.closest.domain.Subscription.Subscription;
 import com.example.closest.domain.blog.Blog;
 import com.example.closest.domain.blog.BlogDomain;
 import com.example.closest.domain.member.Member;
@@ -18,8 +19,14 @@ public class MemberManagementService {
     }
 
     @Transactional
-    public void userSubscriptsBlog(String userEmail, String blogLink) {
+    public void userSubscriptsBlog(String userEmail, String link) {
         Member member = memberDomain.findMemberByUserEmail(userEmail);
-        Blog blog = blogDomain.getOrSaveBlog(blogLink);
+        Blog blog = blogDomain.findBlogByLink(link)
+                .orElseGet(() -> blogDomain.saveBlogByLink(link));
+
+        new Subscription.Builder() //persistence cascade
+                .member(member)
+                .blog(blog)
+                .build();
     }
 }

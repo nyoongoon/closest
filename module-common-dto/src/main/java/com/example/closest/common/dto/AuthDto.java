@@ -12,6 +12,9 @@ public class AuthDto { //TODO Request vs Response 구분
         private String userEmail;
         private String password;
 
+        protected SignIn() { //todo dto objectMapper 사용시 protected 기본생성자 필요..
+        }
+
         private SignIn(Builder builder) {
             this.userEmail = builder.userEmail;
             this.password = builder.password;
@@ -53,6 +56,8 @@ public class AuthDto { //TODO Request vs Response 구분
         private String userEmail;
         private String password;
         private List<Authority> roles;
+
+        protected SignUp(){} //objectMapper 사용 시 필요
 
         private SignUp(Builder builder) {
             this.userEmail = builder.userEmail;

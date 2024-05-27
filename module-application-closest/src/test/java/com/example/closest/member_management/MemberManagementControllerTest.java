@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -31,6 +32,7 @@ class MemberManagementControllerTest {
     @Test
     @MockUser()
     @DisplayName("이메일과 링크로 유저에 블로그를 추가한다. ")
+    @Transactional
     void test1() throws Exception {
         // given
         String userEmail = "abc@naver.com";
@@ -47,7 +49,6 @@ class MemberManagementControllerTest {
         );
 
         String json = objectMapper.writeValueAsString(request);
-
 
         // expected
         mockMvc.perform(post("/member-management/blog")
