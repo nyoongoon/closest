@@ -105,7 +105,7 @@ public class TokenProviderJwtImpl implements TokenProvider {
 
     // 권한 얻기
     @Override
-    public Authentication getAuthentication(String token) {
+    public Authentication getAuthentication(String token) { //엑세스 토큰 검증 시 마다 userDetailsService로 DB 접근
         String userEmail = this.parseClaims(token, this.accessSecretKey).getSubject();
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 

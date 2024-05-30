@@ -18,9 +18,6 @@ class MemberManagementServiceTest {
     private MemberDomain memberDomain;
     @Autowired
     private MemberManagementService memberManagementService;
-    @Qualifier("blogDomain")
-    @Autowired
-    private BlogDomain blogDomain;
 
     @Test
     @DisplayName("블로그 엔티티 등록하고 멤버 연관관계 맺는다")

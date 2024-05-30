@@ -37,6 +37,12 @@ subprojects {
         implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
         //jwt -> java11 이상 javax.xml.bind.DatatypeConverter 의존성 이슈
         implementation 'javax.xml.bind:jaxb-api:2.3.0'
+        // jsoup
+        implementation 'org.jsoup:jsoup:1.17.2'
+        // ROME (RSS READER)
+        implementation 'com.rometools:rome:2.1.0'
+
+
 
         //h2
         runtimeOnly 'com.h2database:h2' //http://localhost:8080/h2-console

@@ -23,10 +23,8 @@ public class MemberManagementService {
         Member member = memberDomain.findMemberByUserEmail(userEmail);
         Blog blog = blogDomain.findBlogByLink(link)
                 .orElseGet(() -> blogDomain.saveBlogByLink(link));
-
-        new Subscription.Builder() //persistence cascade
-                .member(member)
-                .blog(blog)
-                .build();
+        Subscription.of(member, blog); //persistence cascade
     }
+
+
 }

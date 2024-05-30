@@ -22,9 +22,11 @@ public class Subscription {
     protected Subscription(){
     }
 
-    private Subscription(Builder builder) {
-        setMember(builder.member);
-        setBlog(builder.blog);
+    public static Subscription of(Member member, Blog blog){
+        Subscription subscription = new Subscription();
+        subscription.setMember(member);
+        subscription.setBlog(blog);
+        return subscription;
     }
 
     public Member getMember() {
@@ -35,7 +37,7 @@ public class Subscription {
         return blog;
     }
 
-    public void setMember(Member member) {
+    private void setMember(Member member) {
         if (this.member != null) {
             this.member.getSubscriptions().remove(this);
         }
@@ -44,34 +46,11 @@ public class Subscription {
     }
 
 
-    public void setBlog(Blog blog) {
-        if (this.member != null) {
-            this.member.getSubscriptions().remove(this);
+    private void setBlog(Blog blog) {
+        if (this.blog != null) {
+            this.blog.getSubscriptions().remove(this);
         }
-        this.member = member;
-        member.getSubscriptions().add(this);
-    }
-
-
-    public static final class Builder {
-        private Member member;
-        private Blog blog;
-
-        public Builder() {
-        }
-
-        public Builder member(Member member) {
-            this.member = member;
-            return this;
-        }
-
-        public Builder blog(Blog blog) {
-            this.blog = blog;
-            return this;
-        }
-
-        public Subscription build() {
-            return new Subscription(this);
-        }
+        this.blog = blog;
+        blog.getSubscriptions().add(this);
     }
 }
