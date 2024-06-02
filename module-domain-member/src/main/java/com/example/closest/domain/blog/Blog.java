@@ -1,5 +1,6 @@
 package com.example.closest.domain.blog;
 
+import com.example.closest.domain.Post.Post;
 import com.example.closest.domain.Subscription.Subscription;
 import jakarta.persistence.*;
 
@@ -13,11 +14,14 @@ public class Blog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique=true)
+    @Column(nullable = false, unique=true)
     private String link;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
     private List<Subscription> subscriptions = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
+    private List<Post> posts = new ArrayList<>();
 
     protected Blog() {
     }
@@ -34,6 +38,9 @@ public class Blog {
         return subscriptions;
     }
 
+    public List<Post> getPosts() {
+        return posts;
+    }
 
     public static final class Builder {
         private String link;

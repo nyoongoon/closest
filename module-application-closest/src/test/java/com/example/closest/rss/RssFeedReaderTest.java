@@ -29,5 +29,6 @@ class RssFeedReaderTest {
             log.info("result : {}", entry);
         }
 
+        log.info("size : {}", entries.size());
     }
 }

@@ -13,8 +13,18 @@ public class BlogDomainImpl implements BlogDomain {
     }
 
     @Override
+    public Optional<Blog> findById(Long id) {
+        return blogRepository.findById(id);
+    }
+
+    @Override
     public Optional<Blog> findBlogByLink(String link) {
         return blogRepository.findByLink(link);
+    }
+
+    @Override
+    public Optional<Blog> findBlogByIdWithPostUsingFetchJoin(Long id) {
+        return Optional.empty()
     }
 
     @Override

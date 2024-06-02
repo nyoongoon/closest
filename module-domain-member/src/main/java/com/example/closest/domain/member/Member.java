@@ -24,8 +24,10 @@ public class Member implements UserDetails {
     private Long id;
 
     // Unique
+    @Column(nullable = false, unique = true)
     private String userEmail;
 
+    @Column(nullable = false)
     private String password;
 
     private List<Authority> roles = new ArrayList<>();
