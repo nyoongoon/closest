@@ -9,12 +9,12 @@ import java.util.Optional;
 
 @Repository
 interface BlogRepository extends JpaRepository<Blog, Long> {
-    Optional<Blog> findByLink(String link);
+    Optional<Blog> findByUrl(URL url);
 //    @Query("SELECT distinct t FROM Team t join fetch t.members")
 //    public List<Team> findAllWithMemberUsingFetchJoin();
 
     @Query("SELECT b FROM Blog b join fetch b.posts WHERE b.id = :id")
     Optional<Blog> findBlogByIdWithPostUsingFetchJoin(Long id);
 
-    boolean existsByLink(URL link);
+    boolean existsByUrl(URL url);
 }

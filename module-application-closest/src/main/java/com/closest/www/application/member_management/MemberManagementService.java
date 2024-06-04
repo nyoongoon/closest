@@ -31,13 +31,11 @@ public class MemberManagementService {
     }
 
     @Transactional
-    public void userSubscriptsBlog(String userEmail, String link) {
+    public void userSubscriptsBlog(String userEmail, URL url) {
         Member member = memberDomain.findMemberByUserEmail(userEmail);
 
-
-
-        Blog blog = blogDomain.existsByLink(link) ?
-                blogDomain.findBlogByLink(link) : blogDomain.saveByLink(link);
+        Blog blog = blogDomain.existsByUrl(url) ?
+                blogDomain.findBlogByUrl(url) : blogDomain.saveByUrl(url);
 
         Subscription.of(member, blog); //persistence cascade
     }
@@ -47,8 +45,7 @@ public class MemberManagementService {
     public void updateBlogPosts(Long blogId) throws MalformedURLException, FailToReadFeedException {
         Blog blog = blogDomain.findBlogByIdWithPostUsingFetchJoin(blogId);
 
-
-        SyndFeed syndFeed = rssFeedReader.readFeed(new URL(blog.getLink()));
+        SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
         syndFeed.getEntries().size();
 
 

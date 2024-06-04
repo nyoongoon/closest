@@ -19,7 +19,6 @@ public class MemberManagementController {
     @PostMapping("/blog")
     @PreAuthorize("hasRole('WRITE')")
     public void addBlog(@RequestBody AddBlogRequest addBlogRequest) {
-        memberManagementService.userSubscriptsBlog(addBlogRequest.userEmail(), addBlogRequest.blogLink());
+        memberManagementService.userSubscriptsBlog(addBlogRequest.userEmail(), addBlogRequest.url());
     }
-
 }

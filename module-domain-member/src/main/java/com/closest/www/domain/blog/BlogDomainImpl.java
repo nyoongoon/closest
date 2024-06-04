@@ -3,6 +3,7 @@ package com.closest.www.domain.blog;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 
 @Service
 public class BlogDomainImpl implements BlogDomain {
@@ -19,13 +20,13 @@ public class BlogDomainImpl implements BlogDomain {
     }
 
     @Override
-    public boolean existsByLink(URL link) {
-        return blogRepository.existsByLink(link);
+    public boolean existsByUrl(URL url) {
+        return blogRepository.existsByUrl(url);
     }
 
     @Override
-    public Blog findBlogByLink(URL link) {
-        return blogRepository.findByLink(link)
+    public Blog findBlogByUrl(URL url) {
+        return blogRepository.findByUrl(url)
                 .orElseThrow(() -> new BlogNotFoundException());
     }
 
@@ -36,11 +37,10 @@ public class BlogDomainImpl implements BlogDomain {
     }
 
     @Override
-    public Blog saveByLink(String link) {
-
-
+    public Blog saveByUrl(URL url) {
         Blog blog = new Blog.Builder()
-                .link(link)
+                .url(url)
+                .lastPublishedDate(LocalDateTime.now())
                 .build();
         return blogRepository.save(blog);
     }

@@ -2,15 +2,17 @@ package com.closest.www.domain.blog;
 
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
+
 @Service
 public interface BlogDomain {
     Blog findById(Long id);
 
-    Blog findBlogByLink(String link);
+    Blog findBlogByUrl(URL url);
 
-    boolean existsByLink(String link);
+    boolean existsByUrl(URL url);
 
     Blog findBlogByIdWithPostUsingFetchJoin(Long id);
 
-    Blog saveByLink(String link);
+    Blog saveByUrl(URL url);
 }

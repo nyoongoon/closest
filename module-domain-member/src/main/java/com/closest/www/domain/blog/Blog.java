@@ -17,7 +17,7 @@ public class Blog {
     private Long id;
 
     @Column(nullable = false, unique=true)
-    private URL link;
+    private URL url;
 
     @Column(nullable = false, unique=true)
     private LocalDateTime lastPublishedDate;
@@ -32,12 +32,12 @@ public class Blog {
     }
 
     private Blog(Builder builder) {
-        this.link = builder.link;
+        this.url = builder.url;
         this.lastPublishedDate = builder.lastPublishedDate;
     }
 
-    public URL getLink() {
-        return link;
+    public URL getUrl() {
+        return url;
     }
 
     public List<Subscription> getSubscriptions() {
@@ -49,18 +49,18 @@ public class Blog {
     }
 
     public static final class Builder {
-        private URL link;
+        private URL url;
         private LocalDateTime lastPublishedDate;
 
         public Builder() {
         }
 
-        public Builder link(URL link) {
-            this.link = link;
+        public Builder url(URL url) {
+            this.url = url;
             return this;
         }
 
-        public Builder link(LocalDateTime lastPublishedDate) {
+        public Builder lastPublishedDate(LocalDateTime lastPublishedDate) {
             this.lastPublishedDate = lastPublishedDate;
             return this;
         }
