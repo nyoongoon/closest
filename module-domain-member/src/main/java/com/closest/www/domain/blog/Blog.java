@@ -19,6 +19,9 @@ public class Blog {
     @Column(nullable = false, unique = true)
     private URL url;
 
+    @Column(nullable = false)
+    private String author;
+
     @Column
     private LocalDateTime lastPublishedDate;
 
@@ -62,6 +65,7 @@ public class Blog {
 
     public static final class Builder {
         private URL url;
+        private String author;
         private LocalDateTime lastPublishedDate;
 
         public Builder() {
@@ -69,6 +73,11 @@ public class Blog {
 
         public Builder url(URL url) {
             this.url = url;
+            return this;
+        }
+
+        public Builder author(String author) {
+            this.author = author;
             return this;
         }
 
