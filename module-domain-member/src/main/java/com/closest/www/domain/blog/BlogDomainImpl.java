@@ -40,7 +40,6 @@ public class BlogDomainImpl implements BlogDomain {
     public Blog saveByUrl(URL url) {
         Blog blog = new Blog.Builder()
                 .url(url)
-                .lastPublishedDate(LocalDateTime.now())
                 .build();
         return blogRepository.save(blog);
     }

@@ -16,10 +16,10 @@ public class Blog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique=true)
+    @Column(nullable = false, unique = true)
     private URL url;
 
-    @Column(nullable = false, unique=true)
+    @Column
     private LocalDateTime lastPublishedDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
@@ -36,8 +36,16 @@ public class Blog {
         this.lastPublishedDate = builder.lastPublishedDate;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public URL getUrl() {
         return url;
+    }
+
+    public LocalDateTime getLastPublishedDate() {
+        return lastPublishedDate;
     }
 
     public List<Subscription> getSubscriptions() {
@@ -46,6 +54,10 @@ public class Blog {
 
     public List<Post> getPosts() {
         return posts;
+    }
+
+    public void updateLastPublishedDate(LocalDateTime lastPublishedDate) {
+        this.lastPublishedDate = lastPublishedDate;
     }
 
     public static final class Builder {

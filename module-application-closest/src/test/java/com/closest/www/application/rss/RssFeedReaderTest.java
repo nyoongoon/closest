@@ -22,18 +22,20 @@ class RssFeedReaderTest {
     private RssFeedReader rssFeedReader;
 
     @Test
-    @DisplayName("")
+    @DisplayName("RssFeed 테스트")
     void test1() throws FailToReadFeedException, MalformedURLException {
         URL url = new URL("https://jojoldu.tistory.com/rss");
         SyndFeed syndFeed = rssFeedReader.readFeed(url);
 //        log.info("result : {}" , syndFeed);
         List<SyndEntry> entries = syndFeed.getEntries();
         SyndEntry syndEntry = entries.get(0);
-        log.info("syndEntry : {} ", syndEntry);
-//        for (SyndEntry entry : entries) {
-//            log.info("result : {}", entry);
-//        }
-//
+//        log.info("syndEntry : {} ", syndEntry);
+        for (SyndEntry entry : entries) {
+            log.info("link : {}", entry.getLink());
+            log.info("title : {}", entry.getTitle());
+            log.info("publishedDate : {}", entry.getPublishedDate());
+        }
+
 //        log.info("size : {}", entries.size());
     }
 }
