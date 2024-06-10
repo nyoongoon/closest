@@ -49,7 +49,9 @@ class MemberManagementServiceTest {
         // when
         memberManagementService.memberSubscriptsBlog(userEmail, link);
         // then
-        assertThat(member.getSubscriptions().get(0).getBlog().getUrl()).isEqualTo(link);
+        Blog saved = member.getSubscriptions().get(0).getBlog();
+        assertThat(saved.getAuthor()).isEqualTo(rssFeedReader.readFeed(link).getAuthor());
+        assertThat(saved.getUrl()).isEqualTo(link);
     }
 
     @Test
@@ -58,15 +60,12 @@ class MemberManagementServiceTest {
     void test2() throws MalformedURLException, FailToReadFeedException {
         // given
         URL link = new URL("https://goalinnext.tistory.com/rss");
-        Blog blog = blogDomain.saveByUrl(link);
-
+        SyndFeed syndFeed = rssFeedReader.readFeed(link);
+        Blog blog = blogDomain.saveByUrlAndAuthor(link, syndFeed.getAuthor());
         // when
-        memberManagementService.updateBlogPosts(blog);
-
+        memberManagementService.putAllPostsOfBlog(blog, syndFeed);
         // then
-        SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
         List<SyndEntry> entries = syndFeed.getEntries();
-
         assertThat(blog.getPosts().size()).isEqualTo(entries.size());
     }
 
@@ -76,18 +75,16 @@ class MemberManagementServiceTest {
     void test3() throws MalformedURLException, FailToReadFeedException {
         // given
         URL link = new URL("https://goalinnext.tistory.com/rss");
-        Blog blog = blogDomain.saveByUrl(link);
-
+        SyndFeed syndFeed = rssFeedReader.readFeed(link);
+        Blog blog = blogDomain.saveByUrlAndAuthor(link, syndFeed.getAuthor());
         // when
-        memberManagementService.updateBlogPosts(blog);
-
+        memberManagementService.putAllPostsOfBlog(blog, syndFeed);
         // then
-        SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
         List<SyndEntry> entries = syndFeed.getEntries();
         Date publishedDate = entries.get(0).getPublishedDate();
         LocalDateTime localDateTime = publishedDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
-        assertThat(blog.getLastPublishedDate()).isEqualTo(localDateTime);
+        assertThat(blog.getLastPublishedLocalDateTime()).isEqualTo(localDateTime);
     }
 }

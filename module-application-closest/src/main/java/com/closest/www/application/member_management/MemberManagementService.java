@@ -14,9 +14,11 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -38,31 +40,70 @@ public class MemberManagementService {
     public void memberSubscriptsBlog(String userEmail, URL url) throws FailToReadFeedException {
         Member member = memberDomain.findMemberByUserEmail(userEmail);
 
-        Blog blog = blogDomain.existsByUrl(url) ?
-                blogDomain.findBlogByUrl(url) : blogDomain.saveByUrl(url);
+        Blog blog;
+        if (blogDomain.existsByUrl(url)) {
+            blog = blogDomain.findBlogByUrl(url);
+        } else {
+            SyndFeed syndFeed = rssFeedReader.readFeed(url);
+            blog = blogDomain.saveByUrlAndAuthor(url, syndFeed.getAuthor());
+        }
 
         Subscription.of(member, blog); //persistence cascade
-        updateBlogPosts(blog);
+
+        SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
+        putAllPostsOfBlog(blog, syndFeed);
     }
 
     @Transactional
-    public void updateBlogPosts(Blog blog) throws FailToReadFeedException {
-        SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
+    public Blog putAllPostsOfBlog(Blog blog, SyndFeed syndFeed) {
+        blogDomain.clearPosts(blog);
         List<SyndEntry> entries = syndFeed.getEntries();
 
-        entries.stream().map(e -> Post.of(e.getTitle(), e.getLink(), blog))
+        entries.stream()
+                .map(e -> Post.of(e.getTitle(), e.getLink(), blog)) //Blog-Post 연관관계등록
                 .toList();
 
-        Date publishedDate = entries.get(0).getPublishedDate();
-        //Date to LocalDateTiem
-        LocalDateTime localDateTime = publishedDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+        LocalDateTime localDateTime = getLastPublishdLocalDateTime(syndFeed);
         blog.updateLastPublishedDate(localDateTime);
+        return blog;
     }
 
-    public List<BlogView> getBlogViewsByMember(Member member){
+    @Transactional
+    public List<BlogView> getBlogViewsByMember(Member member) throws FailToReadFeedException, MalformedURLException {
+        List<BlogView> blogViews = new ArrayList<>(); //result
+        List<Subscription> subscriptions = member.getSubscriptions();
+        List<Blog> blogs = subscriptions.stream()
+                .map(Subscription::getBlog).toList();
+
+        for (Blog blog : blogs) {
+            SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
+            LocalDateTime lastPublishdLocalDateTime = getLastPublishdLocalDateTime(syndFeed);
+            boolean isUpdated = blog.isUpdated(lastPublishdLocalDateTime);
+            blog = isUpdated ? putAllPostsOfBlog(blog, syndFeed) : blog;
+
+            String author = blog.getAuthor();
+            URL url = blog.getUrl();
+            URL lastPublishedUrl = getLastPublishdUrl(syndFeed);
+
+            blogViews.add(
+                    BlogView.of(author, url, isUpdated, lastPublishedUrl)
+            );
+        }
+
+        return blogViews;
+    }
 
 
+    private LocalDateTime getLastPublishdLocalDateTime(SyndFeed syndFeed) {
+        Date publishedDate = syndFeed.getEntries().get(0).getPublishedDate(); //정렬이 되어 있음
+        //Date to LocalDateTiem
+        return publishedDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+    }
+
+    private URL getLastPublishdUrl(SyndFeed syndFeed) throws MalformedURLException {
+        String link = syndFeed.getEntries().get(0).getLink();//정렬이 되어 있음
+        return new URL(link);
     }
 }

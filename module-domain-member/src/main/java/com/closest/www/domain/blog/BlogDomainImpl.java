@@ -1,5 +1,6 @@
 package com.closest.www.domain.blog;
 
+import com.closest.www.domain.Post.PostRepository;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
@@ -8,9 +9,11 @@ import java.time.LocalDateTime;
 @Service
 public class BlogDomainImpl implements BlogDomain {
     private final BlogRepository blogRepository;
+    private final PostRepository postRepository;
 
-    public BlogDomainImpl(BlogRepository blogRepository) {
+    public BlogDomainImpl(BlogRepository blogRepository, PostRepository postRepository) {
         this.blogRepository = blogRepository;
+        this.postRepository = postRepository;
     }
 
     @Override
@@ -37,10 +40,16 @@ public class BlogDomainImpl implements BlogDomain {
     }
 
     @Override
-    public Blog saveByUrl(URL url) {
+    public Blog saveByUrlAndAuthor(URL url, String author) {
         Blog blog = new Blog.Builder()
                 .url(url)
+                .author(author)
                 .build();
         return blogRepository.save(blog);
+    }
+
+    @Override
+    public void clearPosts(Blog blog) {
+        postRepository.deleteAllByBlog(blog);
     }
 }

@@ -14,5 +14,7 @@ public interface BlogDomain {
 
     Blog findBlogByIdWithPostUsingFetchJoin(Long id);
 
-    Blog saveByUrl(URL url);
+    Blog saveByUrlAndAuthor(URL url, String author);
+
+    void clearPosts(Blog blog);
 }

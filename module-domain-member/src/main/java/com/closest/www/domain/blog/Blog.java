@@ -23,7 +23,7 @@ public class Blog {
     private String author;
 
     @Column
-    private LocalDateTime lastPublishedDate;
+    private LocalDateTime lastPublishedLocalDateTime;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
     private List<Subscription> subscriptions = new ArrayList<>();
@@ -36,7 +36,8 @@ public class Blog {
 
     private Blog(Builder builder) {
         this.url = builder.url;
-        this.lastPublishedDate = builder.lastPublishedDate;
+        this.author = builder.author;
+        this.lastPublishedLocalDateTime = builder.lastPublishedLocalDateTime;
     }
 
     public Long getId() {
@@ -47,8 +48,12 @@ public class Blog {
         return url;
     }
 
-    public LocalDateTime getLastPublishedDate() {
-        return lastPublishedDate;
+    public String getAuthor() {
+        return author;
+    }
+
+    public LocalDateTime getLastPublishedLocalDateTime() {
+        return lastPublishedLocalDateTime;
     }
 
     public List<Subscription> getSubscriptions() {
@@ -60,13 +65,17 @@ public class Blog {
     }
 
     public void updateLastPublishedDate(LocalDateTime lastPublishedDate) {
-        this.lastPublishedDate = lastPublishedDate;
+        this.lastPublishedLocalDateTime = lastPublishedDate;
+    }
+
+    public boolean isUpdated(LocalDateTime lastPublishedDate) {
+        return this.lastPublishedLocalDateTime != lastPublishedDate;
     }
 
     public static final class Builder {
         private URL url;
         private String author;
-        private LocalDateTime lastPublishedDate;
+        private LocalDateTime lastPublishedLocalDateTime;
 
         public Builder() {
         }
@@ -82,7 +91,7 @@ public class Blog {
         }
 
         public Builder lastPublishedDate(LocalDateTime lastPublishedDate) {
-            this.lastPublishedDate = lastPublishedDate;
+            this.lastPublishedLocalDateTime = lastPublishedDate;
             return this;
         }
 
