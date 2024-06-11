@@ -1,5 +1,6 @@
 package com.closest.www.application.rss;
 
+import com.closest.www.application.RssFeedReaderException;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
@@ -8,19 +9,16 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 @Component
 public class RssFeedReader {
 
-    public SyndFeed readFeed(URL url) throws FailToReadFeedException {
+    public SyndFeed readFeed(URL url) {
         try {
             XmlReader reader = new XmlReader(url);
             return new SyndFeedInput().build(reader);
         } catch (FeedException | IOException e) {
-            throw new FailToReadFeedException();
+            throw new RssFeedReaderException();
         }
     }
 }

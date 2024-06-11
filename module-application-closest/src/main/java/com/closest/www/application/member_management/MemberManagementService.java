@@ -37,7 +37,7 @@ public class MemberManagementService {
     }
 
     @Transactional
-    public void memberSubscriptsBlog(String userEmail, URL url) throws FailToReadFeedException {
+    public void memberSubscriptsBlog(String userEmail, URL url) {
         Member member = memberDomain.findMemberByUserEmail(userEmail);
 
         Blog blog;
@@ -69,7 +69,7 @@ public class MemberManagementService {
     }
 
     @Transactional
-    public List<BlogView> getBlogViewsByMember(Member member) throws FailToReadFeedException, MalformedURLException {
+    public List<BlogView> getBlogViewsByMember(Member member) throws  MalformedURLException {
         List<BlogView> blogViews = new ArrayList<>(); //result
         List<Subscription> subscriptions = member.getSubscriptions();
         List<Blog> blogs = subscriptions.stream()

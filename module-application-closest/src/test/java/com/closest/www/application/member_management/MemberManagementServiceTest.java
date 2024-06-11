@@ -72,7 +72,7 @@ class MemberManagementServiceTest {
     @Test
     @DisplayName("블로그에 포스트 업데이트 시 최근 발생시간이 업데이트 된다.")
     @Transactional
-    void test3() throws MalformedURLException, FailToReadFeedException {
+    void test3() throws MalformedURLException {
         // given
         URL link = new URL("https://goalinnext.tistory.com/rss");
         SyndFeed syndFeed = rssFeedReader.readFeed(link);
@@ -86,5 +86,26 @@ class MemberManagementServiceTest {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
         assertThat(blog.getLastPublishedLocalDateTime()).isEqualTo(localDateTime);
+    }
+
+    @Test
+    @DisplayName("멤버로 블로그 뷰 목록 조회.")
+    @Transactional
+    void test4() throws MalformedURLException, FailToReadFeedException {
+        // given
+        String userEmail = "abc@naver.com";
+        Member member = new Member.Builder()
+                .userEmail(userEmail)
+                .password("1234")
+                .build();
+        memberDomain.regist(member);
+
+        //when
+        URL link = new URL("https://goalinnext.tistory.com/rss");
+        // when
+        memberManagementService.memberSubscriptsBlog(userEmail, link);
+
+        //then
+
     }
 }
