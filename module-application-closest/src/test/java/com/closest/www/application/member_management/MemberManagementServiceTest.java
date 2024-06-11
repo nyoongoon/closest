@@ -1,5 +1,6 @@
 package com.closest.www.application.member_management;
 
+import com.closest.www.application.member_management.response.BlogView;
 import com.closest.www.application.rss.FailToReadFeedException;
 import com.closest.www.application.rss.RssFeedReader;
 import com.closest.www.domain.blog.Blog;
@@ -10,6 +11,8 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class MemberManagementServiceTest {
+    private static final Logger log = LoggerFactory.getLogger(MemberManagementServiceTest.class);
     @Autowired
     BlogDomain blogDomain;
     @Autowired
@@ -91,7 +95,7 @@ class MemberManagementServiceTest {
     @Test
     @DisplayName("멤버로 블로그 뷰 목록 조회.")
     @Transactional
-    void test4() throws MalformedURLException, FailToReadFeedException {
+    void test4() throws MalformedURLException {
         // given
         String userEmail = "abc@naver.com";
         Member member = new Member.Builder()
@@ -99,13 +103,16 @@ class MemberManagementServiceTest {
                 .password("1234")
                 .build();
         memberDomain.regist(member);
-
+        URL link1 = new URL("https://goalinnext.tistory.com/rss");
+        memberManagementService.memberSubscriptsBlog(userEmail, link1);
+        URL link2 = new URL("https://jojoldu.tistory.com/rss");
+        memberManagementService.memberSubscriptsBlog(userEmail, link2);
         //when
-        URL link = new URL("https://goalinnext.tistory.com/rss");
-        // when
-        memberManagementService.memberSubscriptsBlog(userEmail, link);
+        List<BlogView> blogViews = memberManagementService.getBlogViewsByMember(member);
 
         //then
-
+        log.info("result: {}", blogViews.get(0));
+        assertThat(blogViews.get(0).blogUrl()).isEqualTo(new URL("https://goalinnext.tistory.com/rss"));
+        assertThat(blogViews.get(1).blogUrl()).isEqualTo(new URL("https://jojoldu.tistory.com/rss"));
     }
 }

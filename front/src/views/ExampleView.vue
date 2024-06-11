@@ -23,11 +23,34 @@
         @mouseover="handleMouseOver(index)"
         @mouseleave="handleMouseLeave(index)"
     ></div>
+    <div v-if="showLoginModal" class="login-modal">
+      <div class="modal-content">
+        <h2>Login</h2>
+        <form>
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" />
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" />
+          <div class="button-group">
+            <button type="button" class="signup-button">Sign Up</button>
+            <button type="submit" class="login-button">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="toggle-button" @click="toggleTab"></div>
+    <div v-if="showSideTab" class="side-tab"></div>
   </div>
 </template>
 
+
+
+
+
+
+
 <script lang="ts">
-import { defineComponent, reactive, onMounted } from 'vue';
+import { defineComponent, reactive, onMounted, ref } from 'vue';
 
 interface Node {
   position: { x: number; y: number };
@@ -92,8 +115,38 @@ export default defineComponent({
       nodes[index].style.zIndex = '0';
     };
 
+    const showLoginModal = ref(false);
+    const showSideTab = ref(false);
+    const sideTabThreshold = 10; // Distance from the right edge to show the side tab
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!showLoginModal.value && !showSideTab.value && window.innerWidth - event.clientX <= sideTabThreshold) {
+        moveScreenLeft();
+      } else {
+        resetScreenPosition();
+      }
+    };
+
+    const moveScreenLeft = () => {
+      document.getElementById('app')!.style.transform = 'translateX(-100px)';
+    };
+
+    const resetScreenPosition = () => {
+      document.getElementById('app')!.style.transform = 'translateX(0)';
+    };
+
+    const toggleTab = () => {
+      showSideTab.value = !showSideTab.value;
+      if (showSideTab.value) {
+        moveScreenLeft();
+      } else {
+        resetScreenPosition();
+      }
+    };
+
     onMounted(() => {
       startMovement();
+      window.addEventListener('mousemove', handleMouseMove);
     });
 
     return {
@@ -103,10 +156,21 @@ export default defineComponent({
       nodes,
       handleMouseOver,
       handleMouseLeave,
+      showLoginModal,
+      showSideTab,
+      toggleTab,
     };
   },
 });
 </script>
+
+
+
+
+
+
+
+
 
 <style>
 #app {
@@ -115,6 +179,7 @@ export default defineComponent({
   height: 100vh;
   background-color: white;
   overflow: hidden;
+  transition: transform 0.3s ease;
 }
 
 #svg {
@@ -133,4 +198,104 @@ export default defineComponent({
 .center-node {
   background-color: black;
 }
+
+.login-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-content {
+  width: 100%;
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content label {
+  margin-bottom: 5px;
+}
+
+.modal-content input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.signup-button,
+.login-button {
+  width: 48%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.signup-button:hover,
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+.toggle-button {
+  position: fixed; /* 이동하지 않는 고정 위치로 설정 */
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.side-tab {
+  position: fixed;
+  top: 50px;
+  right: 0;
+  width: 7.5px; /* Reduced width to 75% of original */
+  height: calc(100% - 50px); /* Reduced height to start below the toggle button */
+  background-color: rgba(0, 0, 0, 0.5);
+  border-left: 1px solid rgba(204, 204, 204, 0.5); /* Thin gray solid border with transparency */
+  cursor: pointer;
+  z-index: 1000;
+}
 </style>
+
+
+
+
+
+
+
+
+
+
+

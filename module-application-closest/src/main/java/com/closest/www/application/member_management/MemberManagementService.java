@@ -1,7 +1,6 @@
 package com.closest.www.application.member_management;
 
 import com.closest.www.application.member_management.response.BlogView;
-import com.closest.www.application.rss.FailToReadFeedException;
 import com.closest.www.application.rss.RssFeedReader;
 import com.closest.www.domain.Post.Post;
 import com.closest.www.domain.Subscription.Subscription;
