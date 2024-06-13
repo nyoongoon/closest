@@ -39,14 +39,13 @@
         </form>
       </div>
     </div>
-    <div class="toggle-button" @click="toggleTab"></div>
     <div v-if="showSideTab" class="side-tab" @mouseover="handleMouseOverSideTab"
          @mouseleave="handleMouseLeaveSideTab"></div>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, reactive, ref} from 'vue';
+import { defineComponent, onMounted, reactive, ref } from 'vue';
 
 // Node 인터페이스 정의
 interface Node {
@@ -61,13 +60,13 @@ interface Node {
 export default defineComponent({
   name: 'App',
   setup() {
-    const centerNode = reactive({x: window.innerWidth / 2, y: window.innerHeight / 2}); // 중앙 노드의 위치
+    const centerNode = reactive({ x: window.innerWidth / 2, y: window.innerHeight / 2 }); // 중앙 노드의 위치
     const centerNodeSize = 60; // 중앙 노드의 크기
     const nodeSize = 40; // 서브노드의 크기
     const minDistance = 200; // 중앙에서 최소 거리
     const maxDistance = 250; // 중앙에서 최대 거리
     const visibleNodeCount = ref(20); // 화면에 보이는 노드의 개수
-    const range = 50; // 서브노드의 이동 범위
+    const range = 100; // 서브노드의 이동 범위
 
     // 초기 속도 범위 설정
     const initialSpeed = 1; // 초기 속도 범위 값 조절
@@ -86,7 +85,7 @@ export default defineComponent({
     const getRandomVelocity = () => {
       return {
         x: (Math.random() * 2 - 1) * initialSpeed,
-        y: (Math.random() * 2 - 1) * initialSpeed
+        y: (Math.random() * 2 - 1) * initialSpeed,
       };
     };
 
@@ -156,8 +155,7 @@ export default defineComponent({
       }, 100);
     };
 
-    // 기타 함수들...
-
+    // 노드 마우스 오버 이벤트 핸들러
     const handleMouseOver = (index: number) => {
       nodes.forEach((node, i) => {
         if (i !== index) {
@@ -168,6 +166,7 @@ export default defineComponent({
       nodes[index].style.zIndex = '1';
     };
 
+    // 노드 마우스 리브 이벤트 핸들러
     const handleMouseLeave = (index: number) => {
       nodes.forEach((node) => {
         node.isStopped = false;
@@ -178,14 +177,16 @@ export default defineComponent({
 
     const showLoginModal = ref(false);
     const showSideTab = ref(false);
-    const sideTabThreshold = 10; // Distance from the right edge to show the side tab
+    const sideTabThreshold = 10; // Edge distance to trigger side tab
 
     const isMouseOverSideTab = ref(false);
 
+    // 사이드탭 마우스 오버 핸들러
     const handleMouseOverSideTab = () => {
       isMouseOverSideTab.value = true;
     };
 
+    // 사이드탭 마우스 리브 핸들러
     const handleMouseLeaveSideTab = () => {
       isMouseOverSideTab.value = false;
       if (!showSideTab.value) {
@@ -193,37 +194,64 @@ export default defineComponent({
       }
     };
 
+    // 마우스 이동 핸들러
+    let isModalOpen = false;
+    let isMouseOverRightEdge = false; // 오른쪽 끝 임계값에 마우스가 있는지 여부
+    let isMouseOverLeftEdge = false; // 오른쪽 끝 임계값에 마우스가 있는지 여부
+
+    const edgeThreshold = 50; // 오른쪽 끝으로 인식할 임계값
+
     const handleMouseMove = (event: MouseEvent) => {
-      if (
-          !showLoginModal.value &&
-          !showSideTab.value &&
-          window.innerWidth - event.clientX <= sideTabThreshold
-      ) {
-        moveScreenLeft();
-      } else if (!isMouseOverSideTab.value) {
-        resetScreenPosition();
+      const { clientX } = event;
+
+      if (clientX >= window.innerWidth - edgeThreshold) {
+        // 오른쪽 끝으로 마우스를 이동했을 때
+        if (!isMouseOverRightEdge) {
+          moveScreen('left'); // 화면 왼쪽으로 이동
+          if(isModalOpen === false){
+            showLoginModal.value = true; // 모달 열기
+            isModalOpen = true; // 모달 상태 열림으로 설정
+          }else{
+            showLoginModal.value = false; // 모달 닫기
+            isModalOpen = false; // 모달 상태 닫기로 설정
+          }
+          isMouseOverRightEdge = true; // 마우스 위치 업데이트
+        }
+      } else if (isMouseOverRightEdge) {
+        // 오른쪽 끝 임계값을 벗어났을 때
+        resetScreenPosition(); // 화면 위치 초기화
+        isMouseOverRightEdge = false; // 마우스 위치 업데이트
+        isModalOpen = false;
+      }
+
+      if (clientX <= edgeThreshold) {
+        // 왼쪽 끝으로 마우스를 이동했을 때 모달을 닫기
+        moveScreen('right'); // 화면 오른쪽으로 이동
+        // showLoginModal.value = false; // 모달 닫기
+        // isModalOpen = false; // 모달 상태 닫힘으로 설정
+        isMouseOverLeftEdge = true;
+      }else if (isMouseOverLeftEdge) {
+        // 왼쪽 끝 임계값을 벗어났을 때
+        resetScreenPosition(); // 화면 위치 초기화
+        isMouseOverLeftEdge = false; // 마우스 위치 업데이트
       }
     };
 
-    const moveScreenLeft = () => {
-      document.getElementById('app')!.style.transform = 'translateX(-100px)';
+
+
+    // 화면 이동 함수
+    const moveScreen = (direction: 'left' | 'right') => {
+      document.getElementById('app')!.style.transform = direction === 'left' ? 'translateX(-100px)' : 'translateX(100px)';
     };
 
+    // 화면 위치 초기화 함수
     const resetScreenPosition = () => {
       if (!isMouseOverSideTab.value) {
         document.getElementById('app')!.style.transform = 'translateX(0)';
       }
     };
 
-    const toggleTab = () => {
-      showSideTab.value = !showSideTab.value;
-      if (showSideTab.value) {
-        moveScreenLeft();
-      } else {
-        resetScreenPosition();
-      }
-    };
-
+    // 컴포넌트 마운트 시 실행되는 함수
     onMounted(() => {
       startMovement();
       window.addEventListener('mousemove', handleMouseMove);
@@ -238,7 +266,6 @@ export default defineComponent({
       handleMouseLeave,
       showLoginModal,
       showSideTab,
-      toggleTab,
       handleMouseOverSideTab,
       handleMouseLeaveSideTab,
       visibleNodes,
@@ -278,13 +305,70 @@ export default defineComponent({
 
 .login-modal {
   /* 로그인 모달 스타일 */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.modal-content {
+  width: 100%;
 }
 
-.toggle-button {
-  /* 토글 버튼 스타일 */
+.modal-content h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content label {
+  margin-bottom: 5px;
+}
+
+.modal-content input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.signup-button,
+.login-button {
+  width: 48%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.signup-button:hover,
+.login-button:hover {
+  background-color: #0056b3;
 }
 
 .side-tab {
   /* 사이드 탭 스타일 */
 }
 </style>
+
