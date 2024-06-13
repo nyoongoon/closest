@@ -2,8 +2,7 @@
   <div id="app">
     <svg id="svg">
       <!-- 중앙 노드를 원 형태로 표시 -->
-      <circle :cx="centerNode.x" :cy="centerNode.y" :r="centerNodeSize / 2" fill="black" />
-
+      <circle :cx="centerNode.x" :cy="centerNode.y" :r="centerNodeSize / 2" fill="black"/>
       <!-- 다른 노드와 중앙 노드를 선으로 연결 -->
       <line
           v-for="(node, index) in visibleNodes"
@@ -47,25 +46,33 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from 'vue';
+import {defineComponent, onMounted, reactive, ref} from 'vue';
 
+// Node 인터페이스 정의
 interface Node {
-  position: { x: number; y: number };
-  velocity: { x: number; y: number };
-  style: Record<string, string>;
-  isStopped: boolean;
+  position: { x: number; y: number }; // 현재 위치
+  velocity: { x: number; y: number }; // 현재 속도
+  initialPosition: { x: number; y: number }; // 초기 위치
+  bounds: { minX: number; maxX: number; minY: number; maxY: number }; // 이동 범위
+  style: Record<string, string>; // 스타일
+  isStopped: boolean; // 멈춤 상태 여부
 }
 
 export default defineComponent({
   name: 'App',
   setup() {
-    const centerNode = reactive({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-    const centerNodeSize = 60;
-    const nodeSize = 40;
+    const centerNode = reactive({x: window.innerWidth / 2, y: window.innerHeight / 2}); // 중앙 노드의 위치
+    const centerNodeSize = 60; // 중앙 노드의 크기
+    const nodeSize = 40; // 서브노드의 크기
     const minDistance = 200; // 중앙에서 최소 거리
-    const maxDistance = 300; // 중앙에서 최대 거리
-    const visibleNodeCount = ref(4); // 화면에 보이는 노드의 개수
+    const maxDistance = 250; // 중앙에서 최대 거리
+    const visibleNodeCount = ref(20); // 화면에 보이는 노드의 개수
+    const range = 50; // 서브노드의 이동 범위
 
+    // 초기 속도 범위 설정
+    const initialSpeed = 1; // 초기 속도 범위 값 조절
+
+    // 랜덤 위치 생성 함수
     const getRandomPosition = () => {
       const angle = Math.random() * Math.PI * 2;
       const r = minDistance + Math.random() * (maxDistance - minDistance);
@@ -75,24 +82,44 @@ export default defineComponent({
       };
     };
 
+    // 랜덤 속도 생성 함수
     const getRandomVelocity = () => {
       return {
-        x: (Math.random() * 2 - 1) * 2, // 속도를 30% 빠르게
-        y: (Math.random() * 2 - 1) * 2, // 속도를 30% 빠르게
+        x: (Math.random() * 2 - 1) * initialSpeed,
+        y: (Math.random() * 2 - 1) * initialSpeed
       };
     };
 
-    const nodes = reactive<Node[]>([
-      { position: getRandomPosition(), velocity: getRandomVelocity(), style: {}, isStopped: false },
-      { position: getRandomPosition(), velocity: getRandomVelocity(), style: {}, isStopped: false },
-      { position: getRandomPosition(), velocity: getRandomVelocity(), style: {}, isStopped: false },
-      { position: getRandomPosition(), velocity: getRandomVelocity(), style: {}, isStopped: false },
-    ]);
+    // 초기 위치를 기준으로 이동 범위 생성 함수
+    const getInitialBounds = (initialPosition: { x: number; y: number }, range: number) => {
+      return {
+        minX: initialPosition.x - range,
+        maxX: initialPosition.x + range,
+        minY: initialPosition.y - range,
+        maxY: initialPosition.y + range,
+      };
+    };
 
-    const visibleNodes = ref<Node[]>([]);
+    // 서브노드 생성 함수
+    const createNode = () => {
+      const initialPosition = getRandomPosition();
+      const bounds = getInitialBounds(initialPosition, range);
+      return {
+        position: initialPosition,
+        velocity: getRandomVelocity(),
+        initialPosition,
+        bounds,
+        style: {},
+        isStopped: false,
+      };
+    };
+
+    const nodes = reactive<Node[]>(Array.from({ length: 10 }, createNode)); // 서브노드 배열 생성
+    const visibleNodes = ref<Node[]>([]); // 화면에 보이는 노드 배열
 
     let intervalId: number | null = null;
 
+    // 서브노드 움직임 함수
     const startMovement = () => {
       intervalId = setInterval(() => {
         nodes.forEach((node) => {
@@ -100,26 +127,22 @@ export default defineComponent({
             node.position.x += node.velocity.x;
             node.position.y += node.velocity.y;
 
-            // Change velocity slightly to create a more natural movement
+            // 자연스러운 움직임을 위한 속도 변화
             node.velocity.x += (Math.random() * 2 - 1) * 0.01;
             node.velocity.y += (Math.random() * 2 - 1) * 0.01;
 
-            // Limit velocity to keep movement smooth
-            node.velocity.x = Math.max(Math.min(node.velocity.x, 1.3), -1.3); // 최대 속도 1.3으로 제한
-            node.velocity.y = Math.max(Math.min(node.velocity.y, 1.3), -1.3); // 최대 속도 1.3으로 제한
+            // 최대 속도 제한 설정
+            const maxSpeed = 1.3; // 최대 속도 값 조절
+            node.velocity.x = Math.max(Math.min(node.velocity.x, maxSpeed), -maxSpeed);
+            node.velocity.y = Math.max(Math.min(node.velocity.y, maxSpeed), -maxSpeed);
 
-            // Check if the node is outside the circular boundary
-            const dx = node.position.x - centerNode.x;
-            const dy = node.position.y - centerNode.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            // Adjust position if outside the allowed distance range
-            if (distance < minDistance || distance > maxDistance) {
-              const angle = Math.atan2(dy, dx);
-              const targetDistance = Math.min(maxDistance, Math.max(minDistance, distance));
-              node.position.x = centerNode.x + targetDistance * Math.cos(angle);
-              node.position.y = centerNode.y + targetDistance * Math.sin(angle);
+            // 노드가 이동 범위를 벗어나면 반전
+            if (node.position.x < node.bounds.minX || node.position.x > node.bounds.maxX) {
+              node.position.x = Math.max(Math.min(node.position.x, node.bounds.maxX), node.bounds.minX);
               node.velocity.x *= -1;
+            }
+            if (node.position.y < node.bounds.minY || node.position.y > node.bounds.maxY) {
+              node.position.y = Math.max(Math.min(node.position.y, node.bounds.maxY), node.bounds.minY);
               node.velocity.y *= -1;
             }
 
@@ -128,10 +151,12 @@ export default defineComponent({
           }
         });
 
-        // Update visible nodes
+        // 화면에 보이는 노드 업데이트
         visibleNodes.value = nodes.slice(0, visibleNodeCount.value);
       }, 100);
     };
+
+    // 기타 함수들...
 
     const handleMouseOver = (index: number) => {
       nodes.forEach((node, i) => {
@@ -263,4 +288,3 @@ export default defineComponent({
   /* 사이드 탭 스타일 */
 }
 </style>
-
