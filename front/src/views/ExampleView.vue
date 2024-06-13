@@ -221,7 +221,6 @@ export default defineComponent({
         // 오른쪽 끝 임계값을 벗어났을 때
         resetScreenPosition(); // 화면 위치 초기화
         isMouseOverRightEdge = false; // 마우스 위치 업데이트
-        isModalOpen = false;
       }
 
       if (clientX <= edgeThreshold) {
