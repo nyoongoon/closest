@@ -42,15 +42,15 @@
     <div v-if="showSignupModal" class="signup-modal">
       <div class="modal-content">
         <h2>Login</h2>
-        <form>
+        <form @submit.prevent="handleSignupRequest">
           <label for="username">Username:</label>
           <input type="text" id="username" name="username"/>
           <label for="password">Password:</label>
           <input type="password" id="password" name="password"/>
-          <label for="confirm-password">Password:</label>
-          <input type="pconfirm-password" id="confirm-password" name="confirm-password"/>
+          <label for="confirm-password">Confirm Password:</label>
+          <input type="confirm-password" id="confirm-password" name="confirm-password"/>
           <div class="button-group">
-            <button type="submit" class="signup-request-button">Sign Up</button>
+            <button type="submit" class="signup-button signup-request-button">Sign Up</button>
           </div>
         </form>
       </div>
@@ -257,6 +257,45 @@ export default defineComponent({
       showSignupModal.value = true;
     }
 
+    // 회원가입 요청
+    const handleSignupRequest = async (event: Event) => {
+      event.preventDefault();
+      const username = (document.getElementById('username') as HTMLInputElement).value;
+      const password = (document.getElementById('password') as HTMLInputElement).value;
+      const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement).value;
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+      }
+
+      const data = {
+        username: username,
+        password: password,
+      };
+
+      try {
+        const response = await fetch('YOUR_API_ENDPOINT_HERE', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert('Sign up successful!');
+          // 추가적인 로직 (예: 모달 닫기 등)
+        } else {
+          alert('Sign up failed!');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again later.');
+      }
+    };
+
     // 화면 이동 함수
     const moveScreen = (direction: 'left' | 'right') => {
       document.getElementById('app')!.style.transform = direction === 'left' ? 'translateX(-100px)' : 'translateX(100px)';
@@ -283,6 +322,7 @@ export default defineComponent({
       handleMouseOver,
       handleMouseLeave,
       handleOpenSignup,
+      handleSignupRequest,
       showLoginModal,
       showSignupModal,
       showSideTab,
@@ -381,10 +421,12 @@ export default defineComponent({
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
+}
 
-  .signup-request-button {
-    justify-content: center;
-  }
+.signup-request-button {
+  width: 100%; /* 버튼을 부모 요소의 너비에 맞춤 */
+  display: flex;
+  justify-content: center; /* 버튼 내용물을 수평 가운데 정렬 */
 }
 
 .signup-button:hover,
