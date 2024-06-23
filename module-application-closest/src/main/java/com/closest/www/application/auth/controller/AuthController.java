@@ -2,7 +2,7 @@ package com.closest.www.application.auth.controller;
 
 import com.closest.www.application.auth.service.AuthAppService;
 import jakarta.servlet.http.HttpServletResponse;
-import com.closest.www.common.dto.AuthDto;
+import com.closest.www.common.dto.AuthRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +25,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody AuthDto.SignUp signUp) {
+    public ResponseEntity signup(@RequestBody AuthRequest.SignUp signUp) {
         this.authAppService.signup(signUp);
         return ResponseEntity.ok().build();
     }
@@ -40,7 +40,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/signin")
-    public ResponseEntity signin(@RequestBody AuthDto.SignIn signIn,
+    public ResponseEntity signin(@RequestBody AuthRequest.SignIn signIn,
                                  HttpServletResponse response) {
         authAppService.signin(signIn, response);
         return ResponseEntity.ok().build();

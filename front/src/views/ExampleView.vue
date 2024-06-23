@@ -28,8 +28,8 @@
       <div class="modal-content">
         <h2>Login</h2>
         <form>
-          <label for="username">Username:</label>
-          <input type="text" id="username" name="username"/>
+          <label for="userEmail">userEmail:</label>
+          <input type="text" id="userEmail" name="userEmail"/>
           <label for="password">Password:</label>
           <input type="password" id="password" name="password"/>
           <div class="button-group">
@@ -43,11 +43,11 @@
       <div class="modal-content">
         <h2>Login</h2>
         <form @submit.prevent="handleSignupRequest">
-          <label for="username">Username:</label>
-          <input type="text" id="username" name="username"/>
-          <label for="password">Password:</label>
+          <label for="userEmail">메일:</label>
+          <input type="text" id="userEmail" name="userEmail"/>
+          <label for="password">비밀번호:</label>
           <input type="password" id="password" name="password"/>
-          <label for="confirm-password">Confirm Password:</label>
+          <label for="confirm-password">비밀번호 확인:</label>
           <input type="confirm-password" id="confirm-password" name="confirm-password"/>
           <div class="button-group">
             <button type="submit" class="signup-button signup-request-button">Sign Up</button>
@@ -62,6 +62,8 @@
 
 <script lang="ts">
 import {defineComponent, onMounted, reactive, ref} from 'vue';
+import axios from "axios";
+import {useRouter} from "vue-router";
 
 // Node 인터페이스 정의
 interface Node {
@@ -76,6 +78,8 @@ interface Node {
 export default defineComponent({
   name: 'App',
   setup() {
+    const router = useRouter(); //라우터
+
     const centerNode = reactive({x: window.innerWidth / 2, y: window.innerHeight / 2}); // 중앙 노드의 위치
     const centerNodeSize = 60; // 중앙 노드의 크기
     const nodeSize = 40; // 서브노드의 크기
@@ -260,40 +264,25 @@ export default defineComponent({
     // 회원가입 요청
     const handleSignupRequest = async (event: Event) => {
       event.preventDefault();
-      const username = (document.getElementById('username') as HTMLInputElement).value;
+      const userEmail = (document.getElementById('userEmail') as HTMLInputElement).value;
       const password = (document.getElementById('password') as HTMLInputElement).value;
       const confirmPassword = (document.getElementById('confirm-password') as HTMLInputElement).value;
 
       if (password !== confirmPassword) {
-        alert('Passwords do not match!');
+        alert("패스워드가 일치하지 않습니다.");
         return;
       }
 
-      const data = {
-        username: username,
-        password: password,
-      };
-
-      try {
-        const response = await fetch('YOUR_API_ENDPOINT_HERE', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          alert('Sign up successful!');
-          // 추가적인 로직 (예: 모달 닫기 등)
-        } else {
-          alert('Sign up failed!');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred. Please try again later.');
-      }
+      axios
+          .post("/api/auth/signup", {
+            userEmail: userEmail,
+            password: password
+          })
+          .then(() => {
+            // router.replace({name: "example"}) //뒤로가기 못하게 수정
+            alert("회원가입이 완료되었습니다.");
+            showSignupModal.value = false;
+          });
     };
 
     // 화면 이동 함수

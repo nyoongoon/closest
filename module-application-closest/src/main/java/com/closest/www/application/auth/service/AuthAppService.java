@@ -1,6 +1,6 @@
 package com.closest.www.application.auth.service;
 
-import com.closest.www.common.dto.AuthDto;
+import com.closest.www.common.dto.AuthRequest;
 import com.closest.www.common.dto.TokenDto;
 import com.closest.www.application.auth.DuplicateIdException;
 import com.closest.www.domain.member.MemberDomain;
@@ -37,7 +37,7 @@ public class AuthAppService {
      * @param signUp
      */
     @Transactional
-    public void signup(AuthDto.SignUp signUp) {
+    public void signup(AuthRequest.SignUp signUp) {
         // 존재여부 판단
         boolean isExists = memberDomain.isMemberExists(signUp.getUserEmail());
         if (isExists) {
@@ -58,7 +58,7 @@ public class AuthAppService {
      * @param response
      */
     @Transactional
-    public void signin(AuthDto.SignIn signIn, HttpServletResponse response) {
+    public void signin(AuthRequest.SignIn signIn, HttpServletResponse response) {
         //멤버 조회
         Member member = this.memberDomain.findMemberByUserEmail(signIn.getUserEmail());
         // 패스워드 일치 여부

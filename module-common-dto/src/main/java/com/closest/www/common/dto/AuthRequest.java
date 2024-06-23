@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 인증 Dto
  */
-public class AuthDto { //TODO Request vs Response 구분
+public class AuthRequest {
     public static class SignIn {
         private String userEmail;
         private String password;

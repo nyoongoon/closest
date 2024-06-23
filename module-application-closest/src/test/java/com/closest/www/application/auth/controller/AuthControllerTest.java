@@ -1,8 +1,8 @@
 package com.closest.www.application.auth.controller;
 
 import com.closest.www.application.auth.service.AuthAppService;
-import com.closest.www.common.dto.AuthDto.SignIn;
-import com.closest.www.common.dto.AuthDto.SignUp;
+import com.closest.www.common.dto.AuthRequest.SignIn;
+import com.closest.www.common.dto.AuthRequest.SignUp;
 import com.closest.www.common.exception.Authority;
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberDomain;
