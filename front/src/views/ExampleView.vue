@@ -33,8 +33,24 @@
           <label for="password">Password:</label>
           <input type="password" id="password" name="password"/>
           <div class="button-group">
-            <button type="button" class="signup-button">Sign Up</button>
+            <button @click="handleOpenSignup()" type="button" class="signup-button">Sign Up</button>
             <button type="submit" class="login-button">Login</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div v-if="showSignupModal" class="signup-modal">
+      <div class="modal-content">
+        <h2>Login</h2>
+        <form>
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username"/>
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password"/>
+          <label for="confirm-password">Password:</label>
+          <input type="pconfirm-password" id="confirm-password" name="confirm-password"/>
+          <div class="button-group">
+            <button type="submit" class="signup-request-button">Sign Up</button>
           </div>
         </form>
       </div>
@@ -45,7 +61,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from 'vue';
+import {defineComponent, onMounted, reactive, ref} from 'vue';
 
 // Node 인터페이스 정의
 interface Node {
@@ -60,7 +76,7 @@ interface Node {
 export default defineComponent({
   name: 'App',
   setup() {
-    const centerNode = reactive({ x: window.innerWidth / 2, y: window.innerHeight / 2 }); // 중앙 노드의 위치
+    const centerNode = reactive({x: window.innerWidth / 2, y: window.innerHeight / 2}); // 중앙 노드의 위치
     const centerNodeSize = 60; // 중앙 노드의 크기
     const nodeSize = 40; // 서브노드의 크기
     const minDistance = 200; // 중앙에서 최소 거리
@@ -113,7 +129,7 @@ export default defineComponent({
       };
     };
 
-    const nodes = reactive<Node[]>(Array.from({ length: 10 }, createNode)); // 서브노드 배열 생성
+    const nodes = reactive<Node[]>(Array.from({length: 10}, createNode)); // 서브노드 배열 생성
     const visibleNodes = ref<Node[]>([]); // 화면에 보이는 노드 배열
 
     let intervalId: number | null = null;
@@ -176,8 +192,8 @@ export default defineComponent({
     };
 
     const showLoginModal = ref(false);
+    const showSignupModal = ref(false);
     const showSideTab = ref(false);
-    const sideTabThreshold = 10; // Edge distance to trigger side tab
 
     const isMouseOverSideTab = ref(false);
 
@@ -195,23 +211,23 @@ export default defineComponent({
     };
 
     // 마우스 이동 핸들러
-    let isModalOpen = false;
+    let isModalOpen = false; // 모달 오픈 여부
     let isMouseOverRightEdge = false; // 오른쪽 끝 임계값에 마우스가 있는지 여부
     let isMouseOverLeftEdge = false; // 오른쪽 끝 임계값에 마우스가 있는지 여부
 
-    const edgeThreshold = 50; // 오른쪽 끝으로 인식할 임계값
+    const edgeThreshold = 150; // 좌우 끝으로 인식할 임계값
 
     const handleMouseMove = (event: MouseEvent) => {
-      const { clientX } = event;
+      const {clientX} = event;
 
       if (clientX >= window.innerWidth - edgeThreshold) {
         // 오른쪽 끝으로 마우스를 이동했을 때
         if (!isMouseOverRightEdge) {
           moveScreen('left'); // 화면 왼쪽으로 이동
-          if(isModalOpen === false){
+          if (isModalOpen === false) {
             showLoginModal.value = true; // 모달 열기
             isModalOpen = true; // 모달 상태 열림으로 설정
-          }else{
+          } else {
             showLoginModal.value = false; // 모달 닫기
             isModalOpen = false; // 모달 상태 닫기로 설정
           }
@@ -226,17 +242,20 @@ export default defineComponent({
       if (clientX <= edgeThreshold) {
         // 왼쪽 끝으로 마우스를 이동했을 때 모달을 닫기
         moveScreen('right'); // 화면 오른쪽으로 이동
-        // showLoginModal.value = false; // 모달 닫기
-        // isModalOpen = false; // 모달 상태 닫힘으로 설정
         isMouseOverLeftEdge = true;
-      }else if (isMouseOverLeftEdge) {
+      } else if (isMouseOverLeftEdge) {
         // 왼쪽 끝 임계값을 벗어났을 때
         resetScreenPosition(); // 화면 위치 초기화
         isMouseOverLeftEdge = false; // 마우스 위치 업데이트
       }
     };
 
-
+    // 회원가입 버튼 클릭 핸들러
+    const handleOpenSignup = () => {
+      // 회원가입 모달로 변경
+      showLoginModal.value = false;
+      showSignupModal.value = true;
+    }
 
     // 화면 이동 함수
     const moveScreen = (direction: 'left' | 'right') => {
@@ -263,7 +282,9 @@ export default defineComponent({
       nodes,
       handleMouseOver,
       handleMouseLeave,
+      handleOpenSignup,
       showLoginModal,
+      showSignupModal,
       showSideTab,
       handleMouseOverSideTab,
       handleMouseLeaveSideTab,
@@ -274,7 +295,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style lang="scss">
 #app {
   position: relative;
   width: 100vw;
@@ -302,8 +323,8 @@ export default defineComponent({
   fill: black;
 }
 
-.login-modal {
-  /* 로그인 모달 스타일 */
+.login-modal, .signup-modal {
+  /* 로그인, 회원가입 모달 스타일 */
   position: fixed;
   top: 50%;
   left: 50%;
@@ -319,6 +340,7 @@ export default defineComponent({
   align-items: center;
   padding: 20px;
 }
+
 .modal-content {
   width: 100%;
 }
@@ -359,6 +381,10 @@ export default defineComponent({
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
+
+  .signup-request-button {
+    justify-content: center;
+  }
 }
 
 .signup-button:hover,
