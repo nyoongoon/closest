@@ -27,14 +27,14 @@
     <div v-if="showLoginModal" class="login-modal">
       <div class="modal-content">
         <h2>Login</h2>
-        <form>
+        <form @submit.prevent="handleSigninRequest">
           <label for="userEmail">userEmail:</label>
           <input type="text" id="userEmail" name="userEmail"/>
           <label for="password">Password:</label>
           <input type="password" id="password" name="password"/>
           <div class="button-group">
-            <button @click="handleOpenSignup()" type="button" class="signup-button">Sign Up</button>
-            <button type="submit" class="login-button">Login</button>
+            <button @click="handleOpenSignup()" type="button" class="signup-button">회원가입</button>
+            <button type="submit" class="login-button">로그인</button>
           </div>
         </form>
       </div>
@@ -254,6 +254,22 @@ export default defineComponent({
       }
     };
 
+    // 로그인 요청
+    const handleSigninRequest = async (event: Event) => {
+      event.preventDefault();
+      const userEmail = (document.getElementById('userEmail') as HTMLInputElement).value;
+      const password = (document.getElementById('password') as HTMLInputElement).value;
+      axios
+          .post("/api/auth/signin", {
+            userEmail: userEmail,
+            password: password
+          })
+          .then(() => {
+            alert("로그인이 완료되었습니다.");
+            showLoginModal.value = false;
+          });
+    }
+
     // 회원가입 버튼 클릭 핸들러
     const handleOpenSignup = () => {
       // 회원가입 모달로 변경
@@ -312,6 +328,7 @@ export default defineComponent({
       handleMouseLeave,
       handleOpenSignup,
       handleSignupRequest,
+      handleSigninRequest,
       showLoginModal,
       showSignupModal,
       showSideTab,
