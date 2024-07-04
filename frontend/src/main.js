@@ -2,11 +2,11 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
 import App from './App.vue';
-import { router } from './helpers';
+import {fakeBackend, router} from './helpers';
 import { useAuthStore } from './stores';
 
 // setup fake backend
-import { fakeBackend } from './helpers';
+// import { fakeBackend } from './helpers';
 fakeBackend();
 
 startApp();
