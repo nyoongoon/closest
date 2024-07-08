@@ -1,14 +1,18 @@
 package com.closest.www.api;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseBody
-@org.springframework.web.bind.annotation.ControllerAdvice
+@ControllerAdvice
 public class ControllerExceptionAdvice {
     @ExceptionHandler({AbstractException.class})
-    public ResponseEntity<ErrorResponse> authException(AbstractException e) {
+    public ApiResponse<> authException(AbstractException e) {
 
         int statusCode = e.getStatusCode();
 
@@ -24,6 +28,23 @@ public class ControllerExceptionAdvice {
         ResponseEntity<ErrorResponse> response = ResponseEntity.status(statusCode)
                 .body(body);
 
+        ApiResponse.of(
+                String.valueOf(statusCode),
+                e.getMessage(),
+                null
+        );
+
         return response;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException.class)
+    public ApiResponse<String> bindException(BindException e) {
+        return ApiResponse.of(
+                HttpStatus.BAD_REQUEST,
+                // 첫 번째 에러의 메시지 꺼내기..
+                e.getBindingResult().getAllErrors().get(0).getDefaultMessage(),
+                null
+        );
     }
 }
