@@ -4,7 +4,7 @@ import {fetchWrapper} from '@/utils';
 import {useRouter} from "vue-router";
 
 const router = useRouter();
-const baseUrl = `${import.meta.env.VITE_API_URL}/users`;
+const baseUrl = `/api/auth`;
 
 type User = {
     id: number
@@ -22,7 +22,7 @@ export const useAuthStore = defineStore({
     }),
     actions: {
         async login(username: string, password: string) {
-            this.user = await fetchWrapper.post(`${baseUrl}/authenticate`, {
+            this.user = await fetchWrapper.post(`${baseUrl}/signin`, {
                 username,
                 password
             }, {credentials: 'include'});

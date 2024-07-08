@@ -28,9 +28,9 @@
       <div class="modal-content">
         <h2>Login</h2>
         <form @submit.prevent="handleSigninRequest">
-          <label for="userEmail">userEmail:</label>
+          <label for="userEmail">이메일:</label>
           <input type="text" id="userEmail" name="userEmail"/>
-          <label for="password">Password:</label>
+          <label for="password">비밀번호:</label>
           <input type="password" id="password" name="password"/>
           <div class="button-group">
             <button @click="handleOpenSignup()" type="button" class="signup-button">회원가입</button>
@@ -50,7 +50,7 @@
           <label for="confirm-password">비밀번호 확인:</label>
           <input type="confirm-password" id="confirm-password" name="confirm-password"/>
           <div class="button-group">
-            <button type="submit" class="signup-button signup-request-button">Sign Up</button>
+            <button type="submit" class="signup-button signup-request-button">회원가입</button>
           </div>
         </form>
       </div>
@@ -64,6 +64,7 @@
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from "axios";
 import {useRouter} from "vue-router";
+import {useAuthStore} from "@/stores";
 
 // Node 인터페이스 정의
 interface Node {
@@ -79,6 +80,7 @@ export default defineComponent({
   name: 'App',
   setup() {
     const router = useRouter(); //라우터
+    const authStore = useAuthStore();
 
     const centerNode = reactive({x: window.innerWidth / 2, y: window.innerHeight / 2}); // 중앙 노드의 위치
     const centerNodeSize = 60; // 중앙 노드의 크기
@@ -255,20 +257,35 @@ export default defineComponent({
     };
 
     // 로그인 요청
+    // const handleSigninRequest = async (event: Event) => {
+    //   event.preventDefault();
+    //   const userEmail = (document.getElementById('userEmail') as HTMLInputElement).value;
+    //   const password = (document.getElementById('password') as HTMLInputElement).value;
+    //   axios
+    //       .post("/api/auth/signin", {
+    //         userEmail: userEmail,
+    //         password: password
+    //       })
+    //       .then(() => {
+    //         alert("로그인이 완료되었습니다.");
+    //         showLoginModal.value = false;
+    //       });
+    // }
     const handleSigninRequest = async (event: Event) => {
       event.preventDefault();
       const userEmail = (document.getElementById('userEmail') as HTMLInputElement).value;
       const password = (document.getElementById('password') as HTMLInputElement).value;
-      axios
-          .post("/api/auth/signin", {
-            userEmail: userEmail,
-            password: password
-          })
+
+      return authStore.login(userEmail, password)
           .then(() => {
             alert("로그인이 완료되었습니다.");
             showLoginModal.value = false;
-          });
+            // redirect to previous url or default to home page
+            // router.push(route.query.returnUrl || '/');
+          })
+      // .catch(error => setErrors({apiError: error}));
     }
+
 
     // 회원가입 버튼 클릭 핸들러
     const handleOpenSignup = () => {
@@ -288,6 +305,7 @@ export default defineComponent({
         alert("패스워드가 일치하지 않습니다.");
         return;
       }
+
 
       axios
           .post("/api/auth/signup", {
