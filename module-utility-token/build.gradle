@@ -1,7 +1,0 @@
-bootJar { enabled = false }
-jar { enabled = true }
-
-dependencies {
-    implementation project(":module-common-dto")
-    implementation project(":module-common-constants")
-}
