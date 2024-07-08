@@ -6,26 +6,6 @@
     },
     {
       "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.cypress-ct.json"
     }
-  ],
-  "compilerOptions": {
-    "module": "NodeNext",
-    "experimentalDecorators": true,
-    "baseUrl": ".",
-    "types": [
-      "@types/node",
-      "@nuxt/vue-app"
-    ],
-    "paths": {
-      "~/*": [
-        "./*"
-      ],
-      "@/*": [
-        "./*"
-      ]
-    }
-  }
+  ]
 }
