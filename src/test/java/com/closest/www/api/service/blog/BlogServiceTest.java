@@ -1,7 +1,6 @@
-package com.closest.www.application.member_management;
+package com.closest.www.api.service.blog;
 
 import com.closest.www.api.controller.blog.response.BlogResponse;
-import com.closest.www.api.service.blog.BlogService;
 import com.closest.www.client.rss.exception.FailToReadFeedException;
 import com.closest.www.client.rss.RssFeedReader;
 import com.closest.www.domain.blog.Blog;

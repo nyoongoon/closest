@@ -1,4 +1,4 @@
-package com.closest.www.application.auth.controller;
+package com.closest.www.api.controller.auth;
 
 import com.closest.www.api.service.auth.AuthService;
 import com.closest.www.api.controller.auth.request.AuthRequest.SignIn;

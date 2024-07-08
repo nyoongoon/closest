@@ -1,4 +1,4 @@
-package com.closest.www.application.config;
+package com.closest.www.api.config;
 
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberDomain;

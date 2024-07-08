@@ -1,4 +1,4 @@
-package com.closest.www.application.config;
+package com.closest.www.api.config;
 
 import org.springframework.security.test.context.support.WithSecurityContext;
 

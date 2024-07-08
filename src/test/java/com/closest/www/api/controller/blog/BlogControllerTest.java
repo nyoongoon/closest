@@ -1,6 +1,6 @@
-package com.closest.www.application.member_management;
+package com.closest.www.api.controller.blog;
 
-import com.closest.www.application.config.MockUser;
+import com.closest.www.api.config.MockUser;
 import com.closest.www.api.controller.blog.request.AddBlogRequest;
 import com.closest.www.domain.blog.BlogDomain;
 import com.closest.www.domain.member.Member;
