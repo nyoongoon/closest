@@ -1,6 +1,5 @@
 package com.closest.www.domain.member;
 
-import com.closest.www.common.exception.Authority;
 import com.closest.www.domain.subscription.Subscription;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,7 +29,7 @@ public class Member implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    private List<Authority> roles = new ArrayList<>();
+    private List<MemberAuthority> roles = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member")
     private List<Subscription> subscriptions = new ArrayList<>();
@@ -45,7 +44,7 @@ public class Member implements UserDetails {
     }
 
 
-    public static Member of(String userEmail, String password, List<Authority> roles) {
+    public static Member of(String userEmail, String password, List<MemberAuthority> roles) {
         return new Builder()
                 .userEmail(userEmail)
                 .password(password)
@@ -98,7 +97,7 @@ public class Member implements UserDetails {
         return password;
     }
 
-    public List<Authority> getRoles() {
+    public List<MemberAuthority> getRoles() {
         return roles;
     }
 
@@ -110,7 +109,7 @@ public class Member implements UserDetails {
         private Long id;
         private String userEmail;
         private String password;
-        private List<Authority> roles;
+        private List<MemberAuthority> roles;
 
         public Builder() {
         }
@@ -125,7 +124,7 @@ public class Member implements UserDetails {
             return this;
         }
 
-        public Builder roles(List<Authority> roles) {
+        public Builder roles(List<MemberAuthority> roles) {
             this.roles = roles;
             return this;
         }

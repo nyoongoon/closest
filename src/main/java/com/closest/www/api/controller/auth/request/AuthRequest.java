@@ -1,6 +1,7 @@
 package com.closest.www.api.controller.auth.request;
 
-import com.closest.www.common.exception.Authority;
+
+import com.closest.www.domain.member.MemberAuthority;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class AuthRequest {
     public static class SignUp {
         private String userEmail;
         private String password;
-        private List<Authority> roles;
+        private List<MemberAuthority> roles;
 
         protected SignUp(){} //objectMapper 사용 시 필요
 
@@ -73,14 +74,14 @@ public class AuthRequest {
             return password;
         }
 
-        public List<Authority> getRoles() {
+        public List<MemberAuthority> getRoles() {
             return roles;
         }
 
         public static final class Builder {
             private String userEmail;
             private String password;
-            private List<Authority> roles;
+            private List<MemberAuthority> roles;
 
             public Builder() {
             }
@@ -95,7 +96,7 @@ public class AuthRequest {
                 return this;
             }
 
-            public Builder roles(List<Authority> roles) {
+            public Builder roles(List<MemberAuthority> roles) {
                 this.roles = roles;
                 return this;
             }

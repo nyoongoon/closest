@@ -7,7 +7,7 @@ import com.closest.www.domain.member.MemberDomain;
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.token.TokenDomain;
 import com.closest.www.domain.token.Token;
-import com.closest.www.utility.token.TokenProvider;
+import com.closest.www.utility.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
-    private final TokenProvider tokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder; //todo 도메인 영역으로 옮길 수 있을지?
     private final MemberDomain memberDomain;
     private final TokenDomain tokenDomain;
 
-    public AuthService(TokenProvider tokenProvider, PasswordEncoder passwordEncoder, MemberDomain memberDomain, TokenDomain tokenDomain) {
-        this.tokenProvider = tokenProvider;
+    public AuthService(JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder, MemberDomain memberDomain, TokenDomain tokenDomain) {
+        this.jwtTokenProvider = jwtTokenProvider;
         this.passwordEncoder = passwordEncoder;
         this.memberDomain = memberDomain;
         this.tokenDomain = tokenDomain;
@@ -67,14 +67,14 @@ public class AuthService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         // 토큰 Dto 생성
-        TokenDto tokenDto = this.tokenProvider.getTokens(member.getUserEmail(), member.getRoles());
+        TokenDto tokenDto = this.jwtTokenProvider.getTokens(member.getUserEmail(), member.getRoles());
         // 리프레시 토큰 엔티티 생성 및 신규 저장
         Token refreshToken = Token.of(tokenDto.getUserEmail(), tokenDto.getRefreshToken());
         this.tokenDomain.renewalToken(refreshToken);
 
         // 엑세스&리프레시 토큰 쿠키에 저장
-        this.tokenProvider.addAccessTokenToCookie(response, tokenDto.getAccessToken());
-        this.tokenProvider.addRefreshTokenToCookie(response, tokenDto.getRefreshToken());
+        this.jwtTokenProvider.addAccessTokenToCookie(response, tokenDto.getAccessToken());
+        this.jwtTokenProvider.addRefreshTokenToCookie(response, tokenDto.getRefreshToken());
     }
 
     private boolean isPasswordMatches(String originPassword, String encryptedPassword) {
