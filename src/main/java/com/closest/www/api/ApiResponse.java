@@ -12,17 +12,19 @@ public class ApiResponse<T> {
     private HttpStatus status;
     private String message;
     private T data;
-    private Map<String, String> validation = new HashMap<>();
+    private Map<String, String> validation;
 
-    public ApiResponse(HttpStatus status, String message, T data) {
+    public ApiResponse(HttpStatus status, String message, T data, Map<String, String> validation) {
         this.code = status.value();
         this.status = status;
         this.message = message;
         this.data = data;
+        this.validation = validation;
     }
 
+
     public static <T> ApiResponse<T> of(HttpStatus status, String message, T data) {
-        return new ApiResponse<>(status, message, data);
+        return new ApiResponse<>(status, message, data, null);
     }
 
     public static <T> ApiResponse<T> of(HttpStatus status, T data) {
@@ -33,67 +35,31 @@ public class ApiResponse<T> {
         return ApiResponse.of(HttpStatus.OK, HttpStatus.OK.name(), data);
     }
 
-    public int getCode() {
-        return code;
+    public static ApiResponse error(HttpStatus status, String message, Map<String, String> validation) {
+        return new ApiResponse<>(status, message, null, validation);
     }
 
-    public HttpStatus getStatus() {
-        return status;
+    public static ApiResponse error(HttpStatus status, String message) {
+        return ApiResponse.error(status, message, new HashMap<>());
     }
 
-    public String getMessage() {
-        return message;
+    public void addValidation(String fieldName, String errorMessage) {
+        this.validation.put(fieldName, errorMessage);
     }
 
-    public T getData() {
-        return data;
-    }
-
-
-    public static final class Builder {
-        private int code;
-        private HttpStatus status;
-        private String message;
-        private T data;
-        private Map<String, String> validation;
-
-        private Builder() {
-        }
-
-        public static Builder anApiResponse() {
-            return new Builder();
-        }
-
-        public Builder withCode(int code) {
-            this.code = code;
-            return this;
-        }
-
-        public Builder withStatus(HttpStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public Builder withMessage(String message) {
-            this.message = message;
-            return this;
-        }
-
-        public Builder withData(T data) {
-            this.data = data;
-            return this;
-        }
-
-        public Builder withValidation(Map<String, String> validation) {
-            this.validation = validation;
-            return this;
-        }
-
-        public ApiResponse build() {
-            ApiResponse apiResponse = new ApiResponse(status, message, data);
-            apiResponse.validation = this.validation;
-            apiResponse.code = this.code;
-            return apiResponse;
-        }
-    }
+//    public int getCode() {
+//        return code;
+//    }
+//
+//    public HttpStatus getStatus() {
+//        return status;
+//    }
+//
+//    public String getMessage() {
+//        return message;
+//    }
+//
+//    public T getData() {
+//        return data;
+//    }
 }

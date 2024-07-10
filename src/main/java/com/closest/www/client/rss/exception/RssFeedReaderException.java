@@ -14,7 +14,7 @@ public class RssFeedReaderException extends AbstractException {
     }
 
     @Override
-    public int getStatusCode() {
-        return HttpStatus.INTERNAL_SERVER_ERROR.value();
+    public HttpStatus getHttpStatus() {
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }

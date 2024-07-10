@@ -1,6 +1,8 @@
 package com.closest.www.api;
 
 
+import org.springframework.http.HttpStatus;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +17,7 @@ public abstract class AbstractException extends RuntimeException{
         return validation;
     }
 
-    public abstract int getStatusCode();
+    public abstract HttpStatus getHttpStatus();
 
     public void addValidation(String fieldName, String message){
         this.validation.put(fieldName, message);

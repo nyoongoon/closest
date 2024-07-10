@@ -12,7 +12,7 @@ public class DuplicateIdException extends AbstractException {
     }
 
     @Override
-    public int getStatusCode() {
-        return HttpStatus.BAD_REQUEST.value();
+    public HttpStatus getHttpStatus() {
+        return HttpStatus.BAD_REQUEST;
     }
 }
