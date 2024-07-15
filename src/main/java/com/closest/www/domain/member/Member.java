@@ -26,8 +26,10 @@ public class Member implements UserDetails {
     @Column(nullable = false, unique = true)
     private String userEmail;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 64)
     private String password;
+
+    private String nickName;
 
     private List<MemberAuthority> roles = new ArrayList<>();
 
@@ -40,11 +42,12 @@ public class Member implements UserDetails {
     private Member(Builder builder) {
         this.userEmail = builder.userEmail;
         this.password = builder.password;
+        this.nickName = builder.nickName;
         this.roles = builder.roles;
     }
 
 
-    public static Member of(String userEmail, String password, List<MemberAuthority> roles) {
+    public static Member create(String userEmail, String password, List<MemberAuthority> roles) {
         return new Builder()
                 .userEmail(userEmail)
                 .password(password)
@@ -97,6 +100,10 @@ public class Member implements UserDetails {
         return password;
     }
 
+    public String getNickName() {
+        return nickName;
+    }
+
     public List<MemberAuthority> getRoles() {
         return roles;
     }
@@ -109,6 +116,7 @@ public class Member implements UserDetails {
         private Long id;
         private String userEmail;
         private String password;
+        private String nickName;
         private List<MemberAuthority> roles;
 
         public Builder() {
@@ -121,6 +129,11 @@ public class Member implements UserDetails {
 
         public Builder password(String password) {
             this.password = password;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.nickName = name;
             return this;
         }
 

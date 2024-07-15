@@ -29,11 +29,11 @@ public class MockSecurityContext implements WithSecurityContextFactory<MockUser>
         memberDomain.regist(member);
 
 
-        var role = new SimpleGrantedAuthority("ROLE_WRITE");
+        var userRole = new SimpleGrantedAuthority("ROLE_USER");
         var auth = new UsernamePasswordAuthenticationToken(
                 member,
                 member.getPassword(),
-                List.of(role)
+                List.of(userRole)
         );
 
         SecurityContext context = SecurityContextHolder.createEmptyContext();

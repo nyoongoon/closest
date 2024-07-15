@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //OncePerReq
             // 리프레시 토큰 유효
             accessToken = this.jwtTokenProvider.getAccessTokenByRefreshToken(refreshToken);
             this.setAuthenticationByAccessToken(accessToken);
-            this.jwtTokenProvider.addAccessTokenToCookie(response, accessToken);
+            this.jwtTokenProvider.addAccessTokenToCookie(response, accessToken); //todo refreshToken renewal?
         } else {
             throw new TokenExpiredException();
         }

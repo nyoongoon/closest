@@ -47,19 +47,23 @@ public class ApiResponse<T> {
         this.validation.put(fieldName, errorMessage);
     }
 
-//    public int getCode() {
-//        return code;
-//    }
-//
-//    public HttpStatus getStatus() {
-//        return status;
-//    }
-//
-//    public String getMessage() {
-//        return message;
-//    }
-//
-//    public T getData() {
-//        return data;
-//    }
+    public int getCode() {
+        return code;
+    }
+
+    public HttpStatus getStatus() {
+        return status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public Map<String, String> getValidation() {
+        return validation;
+    }
 }

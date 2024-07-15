@@ -18,12 +18,12 @@ public class ControllerExceptionAdvice {
     public ResponseEntity<ApiResponse> authException(AbstractException e) {
 
         ApiResponse body = ApiResponse.error(
-                e.getHttpStatus(),
+                e.getHttpStatus(), //예외 클래스의 Status로 통일
                 e.getMessage(),
                 e.getValidation()
         );
 
-        return ResponseEntity.status(e.getHttpStatus())
+        return ResponseEntity.status(e.getHttpStatus()) //예외 클래스의 Status로 통일
                 .body(body);
     }
 

@@ -23,7 +23,7 @@ public class Token {
         this.tokenValue = tokenValue;
     }
 
-    public static Token of(String userEmail, String tokenValue){
+    public static Token create(String userEmail, String tokenValue){
         return new Token(userEmail, tokenValue);
     }
 

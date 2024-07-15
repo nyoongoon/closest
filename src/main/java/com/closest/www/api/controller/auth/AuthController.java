@@ -1,13 +1,11 @@
 package com.closest.www.api.controller.auth;
 
+import com.closest.www.api.controller.auth.request.SignRequest;
 import com.closest.www.api.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
-import com.closest.www.api.controller.auth.request.AuthRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -25,7 +23,7 @@ public class AuthController {
      * @return
      */
     @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody AuthRequest.SignUp signUp) {
+    public ResponseEntity signup(@RequestBody SignRequest.SignUp signUp) {
         this.authService.signup(signUp);
         return ResponseEntity.ok().build();
     }
@@ -40,9 +38,15 @@ public class AuthController {
      * @return
      */
     @PostMapping("/signin")
-    public ResponseEntity signin(@RequestBody AuthRequest.SignIn signIn,
+    public ResponseEntity signin(@RequestBody SignRequest.SignIn signIn,
                                  HttpServletResponse response) {
         authService.signin(signIn, response);
         return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('READ')")
+    @GetMapping("/refresh")
+    public void refresh(){
+
     }
 }
