@@ -1,6 +1,7 @@
 package com.closest.www.client.rss;
 
-import com.closest.www.client.rss.exception.FailToReadFeedException;
+import com.closest.www.domain.feed.RssFeedReader;
+import com.closest.www.domain.feed.exception.FailToReadFeedException;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import org.junit.jupiter.api.DisplayName;

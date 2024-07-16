@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,10 +48,13 @@ public class Member implements UserDetails {
     }
 
 
-    public static Member create(String userEmail, String password, List<MemberAuthority> roles) {
+    public static Member create(String userEmail,
+                                String password,
+                                List<MemberAuthority> roles,
+                                PasswordEncoder passwordEncoder) {
         return new Builder()
                 .userEmail(userEmail)
-                .password(password)
+                .password(passwordEncoder.encode(password)) //패스워드 암호화
                 .roles(roles)
                 .build();
     }

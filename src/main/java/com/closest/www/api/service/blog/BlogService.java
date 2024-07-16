@@ -1,13 +1,15 @@
 package com.closest.www.api.service.blog;
 
 import com.closest.www.api.controller.blog.response.BlogResponse;
-import com.closest.www.client.rss.RssFeedReader;
+import com.closest.www.api.service.auth.exception.MemberNotFoundException;
+import com.closest.www.api.service.blog.exception.BlogNotFoundException;
+import com.closest.www.domain.feed.RssFeedReader;
+import com.closest.www.domain.blog.Blog;
+import com.closest.www.domain.blog.BlogRepository;
+import com.closest.www.domain.member.Member;
+import com.closest.www.domain.member.MemberRepository;
 import com.closest.www.domain.post.Post;
 import com.closest.www.domain.subscription.Subscription;
-import com.closest.www.domain.blog.Blog;
-import com.closest.www.domain.blog.BlogDomain;
-import com.closest.www.domain.member.Member;
-import com.closest.www.domain.member.MemberDomain;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import org.springframework.stereotype.Service;
@@ -24,30 +26,37 @@ import java.util.List;
 @Service
 public class BlogService {
     private final RssFeedReader rssFeedReader;
-    private final MemberDomain memberDomain;
-    private final BlogDomain blogDomain;
+    private final MemberRepository memberRepository;
+    private final BlogRepository blogRepository;
 
     public BlogService(RssFeedReader rssFeedReader,
-                       MemberDomain memberDomain,
-                       BlogDomain blogDomain) {
+                       MemberRepository memberRepository,
+                       BlogRepository blogRepository) {
         this.rssFeedReader = rssFeedReader;
-        this.memberDomain = memberDomain;
-        this.blogDomain = blogDomain;
+        this.memberRepository = memberRepository;
+        this.blogRepository = blogRepository;
     }
 
     @Transactional
     public void memberSubscriptsBlog(String userEmail, URL url) {
-        Member member = memberDomain.findMemberByUserEmail(userEmail);
+        Member member = memberRepository.findByUserEmail(userEmail)
+                .orElseThrow(MemberNotFoundException::new);
 
         Blog blog;
-        if (blogDomain.existsByUrl(url)) {
-            blog = blogDomain.findBlogByUrl(url);
+        if (blogRepository.existsByUrl(url)) {
+            blog = blogRepository.findByUrl(url)
+                    .orElseThrow(BlogNotFoundException::new);
         } else {
             SyndFeed syndFeed = rssFeedReader.readFeed(url);
-            blog = blogDomain.saveByUrlAndAuthor(url, syndFeed.getAuthor());
+            Blog.create(
+                    url,
+                    syndFeed.getAuthor(),
+                    syndFeed.getPublishedDate()
+            )
+//            blog = blogDomain.saveByUrlAndAuthor(url, syndFeed.getAuthor());
         }
 
-        Subscription.of(member, blog); //persistence cascade
+        Subscription.create(member, blog); //persistence cascade
 
         SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
         putAllPostsOfBlog(blog, syndFeed);
@@ -68,7 +77,7 @@ public class BlogService {
     }
 
     @Transactional
-    public List<BlogResponse> getBlogViewsByMember(Member member) throws  MalformedURLException {
+    public List<BlogResponse> getBlogViewsByMember(Member member) throws MalformedURLException {
         List<BlogResponse> blogResponses = new ArrayList<>(); //result
         List<Subscription> subscriptions = member.getSubscriptions();
         List<Blog> blogs = subscriptions.stream()

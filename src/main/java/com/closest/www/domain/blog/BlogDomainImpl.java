@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.net.URL;
 
 @Service
-public class BlogDomainImpl implements BlogDomain {
+public class BlogDomainImpl {
     private final BlogRepository blogRepository;
     private final PostRepository postRepository;
 

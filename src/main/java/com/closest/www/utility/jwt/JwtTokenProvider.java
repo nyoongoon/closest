@@ -34,6 +34,7 @@ public class JwtTokenProvider {
     private static final long ACCESS_TOKEN_EXPIRED_TIME = 1000 * 60 * 30; //밀리세컨드*초*분* == 30분
     private static final long REFRESH_TOKEN_EXPIRED_TIME = 1000 * 60 * 60 * 24; //밀리세컨드*초*분*시 == 24시간
     private static final String KEY_ROLES = "roles";
+
     private final UserDetailsService userDetailsService;
 
     @Value("{spring.jwt.access-secret-key}")

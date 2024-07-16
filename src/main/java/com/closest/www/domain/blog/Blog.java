@@ -40,6 +40,18 @@ public class Blog {
         this.lastPublishedLocalDateTime = builder.lastPublishedLocalDateTime;
     }
 
+    public static Blog create(
+            URL url,
+            String author,
+            LocalDateTime lastPublishedLocalDateTime
+    ){
+        return new Blog.Builder()
+                .url(url)
+                .author(author)
+                .lastPublishedLocalDateTime(lastPublishedLocalDateTime)
+                .build();
+    }
+
     public Long getId() {
         return id;
     }
@@ -90,7 +102,7 @@ public class Blog {
             return this;
         }
 
-        public Builder lastPublishedDate(LocalDateTime lastPublishedDate) {
+        public Builder lastPublishedLocalDateTime(LocalDateTime lastPublishedDate) {
             this.lastPublishedLocalDateTime = lastPublishedDate;
             return this;
         }

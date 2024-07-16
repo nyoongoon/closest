@@ -1,4 +1,4 @@
-package com.closest.www.client.rss.exception;
+package com.closest.www.domain.feed.exception;
 
 public class FailToReadFeedException extends Throwable {
 }

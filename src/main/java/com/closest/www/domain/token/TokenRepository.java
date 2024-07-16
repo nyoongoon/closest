@@ -7,7 +7,7 @@ import java.util.Optional;
 /**
  * 토큰 리포지토리
  */
-interface TokenRepository extends JpaRepository<Token, Long> {
+public interface TokenRepository extends JpaRepository<Token, Long> {
     Optional<Token> findByUserEmail(String userEmail);
     void deleteByUserEmail(String userEmail);
 }

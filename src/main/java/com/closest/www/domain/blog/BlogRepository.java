@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Optional;
 
 @Repository
-interface BlogRepository extends JpaRepository<Blog, Long> {
+public interface BlogRepository extends JpaRepository<Blog, Long> {
     Optional<Blog> findByUrl(URL url);
 //    @Query("SELECT distinct t FROM Team t join fetch t.members")
 //    public List<Team> findAllWithMemberUsingFetchJoin();

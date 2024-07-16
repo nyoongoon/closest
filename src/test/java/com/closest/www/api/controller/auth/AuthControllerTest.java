@@ -1,15 +1,16 @@
 package com.closest.www.api.controller.auth;
 
 import com.closest.www.api.service.auth.AuthService;
+import com.closest.www.config.configuration.SecurityConfiguration;
+import com.closest.www.config.filter.JwtAuthenticationFilter;
+import com.closest.www.utility.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.SignatureException;
-import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -18,16 +19,17 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 import static com.closest.www.api.controller.auth.request.SignRequest.SignIn;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignUp;
-import static com.closest.www.domain.member.MemberAuthority.ROLE_USER;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-//@SpringBootTest
-//@AutoConfigureMockMvc
-@WebMvcTest
+/**
+ * UserDetailService의 repository는 목으로 해볼 수 있지 않을까..?
+ */
+@Import({SecurityConfiguration.class,
+        JwtAuthenticationFilter.class,
+        JwtTokenProvider.class})
+@WebMvcTest(AuthController.class)
 class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;

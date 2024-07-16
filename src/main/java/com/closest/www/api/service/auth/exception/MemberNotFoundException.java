@@ -4,12 +4,12 @@ import com.closest.www.api.AbstractException;
 import org.springframework.http.HttpStatus;
 
 /**
- * 존재하지 않는 아이디 예외 클래스
+ * 존재하지 않는 회원 예외 클래스
  */
-public class IdNotFoundException extends AbstractException {
-    private static final String MESSAGE = "존재하지 않는 아이디입니다.";
+public class MemberNotFoundException extends AbstractException {
+    private static final String MESSAGE = "존재하지 않는 회원입니다.";
 
-    public IdNotFoundException() {
+    public MemberNotFoundException() {
         super(MESSAGE);
     }
 

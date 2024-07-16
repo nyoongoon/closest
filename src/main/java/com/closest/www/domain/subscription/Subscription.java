@@ -22,7 +22,7 @@ public class Subscription {
     protected Subscription(){
     }
 
-    public static Subscription of(Member member, Blog blog){
+    public static Subscription create(Member member, Blog blog){
         Subscription subscription = new Subscription();
         subscription.setMember(member);
         subscription.setBlog(blog);

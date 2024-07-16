@@ -1,12 +1,11 @@
 package com.closest.www.api.service.blog;
 
 import com.closest.www.api.controller.blog.response.BlogResponse;
-import com.closest.www.client.rss.exception.FailToReadFeedException;
-import com.closest.www.client.rss.RssFeedReader;
+import com.closest.www.domain.feed.exception.FailToReadFeedException;
+import com.closest.www.domain.feed.RssFeedReader;
 import com.closest.www.domain.blog.Blog;
-import com.closest.www.domain.blog.BlogDomain;
 import com.closest.www.domain.member.Member;
-import com.closest.www.domain.member.MemberDomain;
+import com.closest.www.api.service.member.MemberService;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import org.junit.jupiter.api.DisplayName;
@@ -30,11 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BlogServiceTest {
     private static final Logger log = LoggerFactory.getLogger(BlogServiceTest.class);
     @Autowired
-    BlogDomain blogDomain;
-    @Autowired
-    private MemberDomain memberDomain;
-    @Autowired
     private BlogService blogService;
+    @Autowired
+    private MemberService memberService;
     @Autowired
     private RssFeedReader rssFeedReader;
 
@@ -48,7 +45,7 @@ class BlogServiceTest {
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
-        memberDomain.regist(member);
+        memberService.regist(member);
         URL link = new URL("https://goalinnext.tistory.com/rss");
         // when
         blogService.memberSubscriptsBlog(userEmail, link);
@@ -65,7 +62,7 @@ class BlogServiceTest {
         // given
         URL link = new URL("https://goalinnext.tistory.com/rss");
         SyndFeed syndFeed = rssFeedReader.readFeed(link);
-        Blog blog = blogDomain.saveByUrlAndAuthor(link, syndFeed.getAuthor());
+        Blog blog = blogService.saveByUrlAndAuthor(link, syndFeed.getAuthor());
         // when
         blogService.putAllPostsOfBlog(blog, syndFeed);
         // then
@@ -80,7 +77,7 @@ class BlogServiceTest {
         // given
         URL link = new URL("https://goalinnext.tistory.com/rss");
         SyndFeed syndFeed = rssFeedReader.readFeed(link);
-        Blog blog = blogDomain.saveByUrlAndAuthor(link, syndFeed.getAuthor());
+        Blog blog = blogService.saveByUrlAndAuthor(link, syndFeed.getAuthor());
         // when
         blogService.putAllPostsOfBlog(blog, syndFeed);
         // then
@@ -102,7 +99,7 @@ class BlogServiceTest {
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
-        memberDomain.regist(member);
+        memberService.regist(member);
         URL link1 = new URL("https://goalinnext.tistory.com/rss");
         blogService.memberSubscriptsBlog(userEmail, link1);
         URL link2 = new URL("https://jojoldu.tistory.com/rss");
