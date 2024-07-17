@@ -3,14 +3,17 @@ package com.closest.www.api.service.blog;
 import com.closest.www.api.controller.blog.response.BlogResponse;
 import com.closest.www.api.service.auth.exception.MemberNotFoundException;
 import com.closest.www.api.service.blog.exception.BlogNotFoundException;
-import com.closest.www.domain.feed.RssFeedReader;
 import com.closest.www.domain.blog.Blog;
 import com.closest.www.domain.blog.BlogRepository;
+import com.closest.www.domain.feed.Feed;
+import com.closest.www.domain.feed.FeedItem;
+import com.closest.www.domain.feed.FeedRepository;
+import com.closest.www.domain.feed.exception.FeedNotFoundException;
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberRepository;
 import com.closest.www.domain.post.Post;
+import com.closest.www.domain.post.PostRepository;
 import com.closest.www.domain.subscription.Subscription;
-import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,23 +21,23 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class BlogService {
-    private final RssFeedReader rssFeedReader;
+    private final FeedRepository feedRepository;
     private final MemberRepository memberRepository;
     private final BlogRepository blogRepository;
+    private final PostRepository postRepository;
 
-    public BlogService(RssFeedReader rssFeedReader,
+    public BlogService(FeedRepository feedRepository,
                        MemberRepository memberRepository,
-                       BlogRepository blogRepository) {
-        this.rssFeedReader = rssFeedReader;
+                       BlogRepository blogRepository, PostRepository postRepository) {
+        this.feedRepository = feedRepository;
         this.memberRepository = memberRepository;
         this.blogRepository = blogRepository;
+        this.postRepository = postRepository;
     }
 
     @Transactional
@@ -47,31 +50,34 @@ public class BlogService {
             blog = blogRepository.findByUrl(url)
                     .orElseThrow(BlogNotFoundException::new);
         } else {
-            SyndFeed syndFeed = rssFeedReader.readFeed(url);
-            Blog.create(
+            Feed feed = feedRepository.findByUrl(url)
+                    .orElseThrow(FeedNotFoundException::new);
+            blog = Blog.create(
                     url,
-                    syndFeed.getAuthor(),
-                    syndFeed.getPublishedDate()
-            )
+                    feed // todo 검증하기 -> LocalDate -> LocalDateTime으로 변환시 시간은 기본값으로 강제 설정 아닌가? 의미가 없지 않나?
+            );
 //            blog = blogDomain.saveByUrlAndAuthor(url, syndFeed.getAuthor());
         }
 
         Subscription.create(member, blog); //persistence cascade
 
-        SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
+        SyndFeed syndFeed = feedRepository.findByUrl(blog.getUrl())
+                .orElseThrow(FeedNotFoundException::new);
         putAllPostsOfBlog(blog, syndFeed);
     }
 
     @Transactional
-    public Blog putAllPostsOfBlog(Blog blog, SyndFeed syndFeed) {
-        blogDomain.clearPosts(blog);
-        List<SyndEntry> entries = syndFeed.getEntries();
+    public Blog putAllPostsOfBlog(Blog blog, Feed feed) {
+        postRepository.deleteAllByBlog(blog);
 
-        entries.stream()
+        List<FeedItem> feedItems = feed.getFeedItems();
+//        List<SyndEntry> entries = syndFeed.getEntries();
+
+        feedItems.stream()
                 .map(e -> Post.of(e.getTitle(), e.getLink(), blog)) //Blog-Post 연관관계등록
                 .toList();
 
-        LocalDateTime localDateTime = getLastPublishdLocalDateTime(syndFeed);
+        LocalDateTime localDateTime = feed.getLastPublishdLocalDateTime();
         blog.updateLastPublishedDate(localDateTime);
         return blog;
     }
@@ -84,7 +90,8 @@ public class BlogService {
                 .map(Subscription::getBlog).toList();
 
         for (Blog blog : blogs) {
-            SyndFeed syndFeed = rssFeedReader.readFeed(blog.getUrl());
+            SyndFeed syndFeed = feedRepository.findByUrl(blog.getUrl())
+                    .orElseThrow(FeedNotFoundException::new);
             LocalDateTime lastPublishdLocalDateTime = getLastPublishdLocalDateTime(syndFeed);
             boolean isUpdated = blog.isUpdated(lastPublishdLocalDateTime);
             blog = isUpdated ? putAllPostsOfBlog(blog, syndFeed) : blog;
@@ -99,15 +106,6 @@ public class BlogService {
         }
 
         return blogResponses;
-    }
-
-
-    private LocalDateTime getLastPublishdLocalDateTime(SyndFeed syndFeed) {
-        Date publishedDate = syndFeed.getEntries().get(0).getPublishedDate(); //정렬이 되어 있음
-        //Date to LocalDateTiem
-        return publishedDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
     }
 
     private URL getLastPublishdUrl(SyndFeed syndFeed) throws MalformedURLException {

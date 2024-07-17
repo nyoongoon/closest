@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
  * Member 도메인 서비스 구현 클래스
  */
 @Service
-public class MemberService extends CustomUserDetailService {
+public class MemberService extends CustomUserDetailService { // todo..
     private final MemberRepository memberRepository;
 
     public MemberService(MemberRepository memberRepository) {

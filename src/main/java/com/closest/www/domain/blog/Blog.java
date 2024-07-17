@@ -1,5 +1,6 @@
 package com.closest.www.domain.blog;
 
+import com.closest.www.domain.feed.Feed;
 import com.closest.www.domain.post.Post;
 import com.closest.www.domain.subscription.Subscription;
 import jakarta.persistence.*;
@@ -42,13 +43,12 @@ public class Blog {
 
     public static Blog create(
             URL url,
-            String author,
-            LocalDateTime lastPublishedLocalDateTime
+            Feed feed
     ){
         return new Blog.Builder()
                 .url(url)
-                .author(author)
-                .lastPublishedLocalDateTime(lastPublishedLocalDateTime)
+                .author(feed.getAuthor())
+                .lastPublishedLocalDateTime(feed.getLastPublishdLocalDateTime())
                 .build();
     }
 

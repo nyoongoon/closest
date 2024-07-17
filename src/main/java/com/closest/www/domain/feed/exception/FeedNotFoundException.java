@@ -6,10 +6,10 @@ import org.springframework.http.HttpStatus;
 /**
  * RssFeedReader 예외 클래스
  */
-public class RssFeedReaderException extends AbstractException {
-    private static final String MESSAGE = "RSS 피드를 읽어오는 중 에러가 발생하였습니다.";
+public class FeedNotFoundException extends AbstractException {
+    private static final String MESSAGE = "피드를 찾을 수 없습니다.";
 
-    public RssFeedReaderException() {
+    public FeedNotFoundException() {
         super(MESSAGE);
     }
 

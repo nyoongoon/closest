@@ -1,11 +1,14 @@
 package com.closest.www.api.service.blog;
 
 import com.closest.www.api.controller.blog.response.BlogResponse;
-import com.closest.www.domain.feed.exception.FailToReadFeedException;
-import com.closest.www.domain.feed.RssFeedReader;
 import com.closest.www.domain.blog.Blog;
+import com.closest.www.domain.blog.BlogRepository;
+import com.closest.www.domain.feed.Feed;
+import com.closest.www.domain.feed.FeedItem;
+import com.closest.www.domain.feed.FeedRepository;
+import com.closest.www.domain.feed.exception.FeedNotFoundException;
 import com.closest.www.domain.member.Member;
-import com.closest.www.api.service.member.MemberService;
+import com.closest.www.domain.member.MemberRepository;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import org.junit.jupiter.api.DisplayName;
@@ -31,43 +34,49 @@ class BlogServiceTest {
     @Autowired
     private BlogService blogService;
     @Autowired
-    private MemberService memberService;
+    private MemberRepository memberRepository;
     @Autowired
-    private RssFeedReader rssFeedReader;
+    private FeedRepository feedRepository;
+    @Autowired
+    private BlogRepository blogRepository;
 
     @Test
     @DisplayName("블로그 엔티티 등록하고 멤버, 구독 엔티티와 연관관계 맺는다")
     @Transactional
-    void test1() throws MalformedURLException, FailToReadFeedException {
+    void test1() throws MalformedURLException {
         // given
         String userEmail = "abc@naver.com";
         Member member = new Member.Builder()
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
-        memberService.regist(member);
+        memberRepository.save(member);
         URL link = new URL("https://goalinnext.tistory.com/rss");
         // when
         blogService.memberSubscriptsBlog(userEmail, link);
         // then
         Blog saved = member.getSubscriptions().get(0).getBlog();
-        assertThat(saved.getAuthor()).isEqualTo(rssFeedReader.readFeed(link).getAuthor());
+        Feed feed = feedRepository.findByUrl(link).orElseThrow(FeedNotFoundException::new);
+        assertThat(saved.getAuthor()).isEqualTo(feed.getAuthor());
         assertThat(saved.getUrl()).isEqualTo(link);
     }
 
     @Test
     @DisplayName("블로그에 포스트 업데이트 시 최대 50개 포스트가 업데이트된다.")
     @Transactional
-    void test2() throws MalformedURLException, FailToReadFeedException {
+    void test2() throws MalformedURLException {
         // given
-        URL link = new URL("https://goalinnext.tistory.com/rss");
-        SyndFeed syndFeed = rssFeedReader.readFeed(link);
-        Blog blog = blogService.saveByUrlAndAuthor(link, syndFeed.getAuthor());
+        URL url = new URL("https://goalinnext.tistory.com/rss");
+        Feed feed = feedRepository.findByUrl(url)
+                .orElseThrow(FeedNotFoundException::new);
+        Blog blog = Blog.create(url, feed);
+        blogRepository.save(blog);
+
         // when
-        blogService.putAllPostsOfBlog(blog, syndFeed);
+        blogService.putAllPostsOfBlog(blog, feed);
         // then
-        List<SyndEntry> entries = syndFeed.getEntries();
-        assertThat(blog.getPosts().size()).isEqualTo(entries.size());
+        List<FeedItem> feedItems = feed.getFeedItems();
+        assertThat(blog.getPosts().size()).isEqualTo(feedItems.size());
     }
 
     @Test
@@ -75,14 +84,19 @@ class BlogServiceTest {
     @Transactional
     void test3() throws MalformedURLException {
         // given
-        URL link = new URL("https://goalinnext.tistory.com/rss");
-        SyndFeed syndFeed = rssFeedReader.readFeed(link);
-        Blog blog = blogService.saveByUrlAndAuthor(link, syndFeed.getAuthor());
+        URL url = new URL("https://goalinnext.tistory.com/rss");
+        Feed feed = feedRepository.findByUrl(url)
+                .orElseThrow(FeedNotFoundException::new);
+        Blog blog = Blog.create(
+                url,
+                feed
+        );
+        blogRepository.save(blog);
         // when
-        blogService.putAllPostsOfBlog(blog, syndFeed);
+        blogService.putAllPostsOfBlog(blog, feed);
         // then
-        List<SyndEntry> entries = syndFeed.getEntries();
-        Date publishedDate = entries.get(0).getPublishedDate();
+        List<FeedItem> feedItems = feed.getFeedItems();
+        Date publishedDate = feedItems.get(0).getPublishedDate();
         LocalDateTime localDateTime = publishedDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
