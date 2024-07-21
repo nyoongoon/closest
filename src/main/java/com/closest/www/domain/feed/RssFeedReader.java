@@ -1,9 +1,7 @@
 package com.closest.www.domain.feed;
 
-import com.closest.www.domain.feed.exception.FeedNotFoundException;
-import com.rometools.rome.feed.WireFeed;
 import com.rometools.rome.io.FeedException;
-import com.rometools.rome.io.WireFeedInput;
+import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import org.springframework.stereotype.Repository;
 
@@ -17,10 +15,9 @@ public class RssFeedReader implements FeedRepository {
     public Optional<Feed> findByUrl(URL url) {
         try {
             XmlReader reader = new XmlReader(url);
-            WireFeed wireFeed = new WireFeedInput().build(reader);
-            return Optional.ofNullable(new Feed(wireFeed));
+            return Optional.of(new FeedImpl(new SyndFeedInput().build(reader)));
         } catch (FeedException | IOException e) {
-            throw new FeedNotFoundException();
+            return Optional.empty();
         }
     }
 }

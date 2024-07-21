@@ -1,6 +1,5 @@
 package com.closest.www.domain.blog;
 
-import com.closest.www.domain.feed.Feed;
 import com.closest.www.domain.post.Post;
 import com.closest.www.domain.subscription.Subscription;
 import jakarta.persistence.*;
@@ -8,6 +7,7 @@ import jakarta.persistence.*;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -24,7 +24,7 @@ public class Blog {
     private String author;
 
     @Column
-    private LocalDateTime lastPublishedLocalDateTime;
+    private Date lastPublishedDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
     private List<Subscription> subscriptions = new ArrayList<>();
@@ -38,17 +38,18 @@ public class Blog {
     private Blog(Builder builder) {
         this.url = builder.url;
         this.author = builder.author;
-        this.lastPublishedLocalDateTime = builder.lastPublishedLocalDateTime;
+        this.lastPublishedDate = builder.build().lastPublishedDate;
     }
 
     public static Blog create(
             URL url,
-            Feed feed
+            String author,
+            Date lastPublishedDate
     ){
-        return new Blog.Builder()
+        return new Builder()
                 .url(url)
-                .author(feed.getAuthor())
-                .lastPublishedLocalDateTime(feed.getLastPublishdLocalDateTime())
+                .author(author)
+                .lastPublishedDate(lastPublishedDate)
                 .build();
     }
 
@@ -64,8 +65,8 @@ public class Blog {
         return author;
     }
 
-    public LocalDateTime getLastPublishedLocalDateTime() {
-        return lastPublishedLocalDateTime;
+    public Date getLastPublishedDate() {
+        return lastPublishedDate;
     }
 
     public List<Subscription> getSubscriptions() {
@@ -76,18 +77,18 @@ public class Blog {
         return posts;
     }
 
-    public void updateLastPublishedDate(LocalDateTime lastPublishedDate) {
-        this.lastPublishedLocalDateTime = lastPublishedDate;
+    public void updateLastPublishedDate(Date lastPublishedDate) {
+        this.lastPublishedDate = lastPublishedDate;
     }
 
-    public boolean isUpdated(LocalDateTime lastPublishedDate) {
-        return this.lastPublishedLocalDateTime != lastPublishedDate;
-    }
+//    public boolean isUpdated(Date lastPublishedDate) {
+//        return this.lastPublishedDate != lastPublishedDate;
+//    }
 
     public static final class Builder {
         private URL url;
         private String author;
-        private LocalDateTime lastPublishedLocalDateTime;
+        private Date lastPublishedDate;
 
         public Builder() {
         }
@@ -102,8 +103,8 @@ public class Blog {
             return this;
         }
 
-        public Builder lastPublishedLocalDateTime(LocalDateTime lastPublishedDate) {
-            this.lastPublishedLocalDateTime = lastPublishedDate;
+        public Builder lastPublishedDate(Date lastPublishedDate) {
+            this.lastPublishedDate = lastPublishedDate;
             return this;
         }
 

@@ -1,8 +1,10 @@
 package com.closest.www.domain.feed;
 
-import com.rometools.rome.feed.synd.SyndEntryImpl;
+import java.net.URL;
+import java.util.Date;
 
-public class FeedItem extends SyndEntryImpl {
-
+public interface FeedItem {
+    String getTitle();
+    URL getUrl();
 
 }

@@ -54,16 +54,17 @@ public class BlogService {
                     .orElseThrow(FeedNotFoundException::new);
             blog = Blog.create(
                     url,
-                    feed // todo 검증하기 -> LocalDate -> LocalDateTime으로 변환시 시간은 기본값으로 강제 설정 아닌가? 의미가 없지 않나?
+                    feed.getAuthor(), // todo 검증하기 -> LocalDate -> LocalDateTime으로 변환시 시간은 기본값으로 강제 설정 아닌가? 의미가 없지 않나?
+                    feed.getLastPublishdDate()
             );
 //            blog = blogDomain.saveByUrlAndAuthor(url, syndFeed.getAuthor());
         }
 
         Subscription.create(member, blog); //persistence cascade
 
-        SyndFeed syndFeed = feedRepository.findByUrl(blog.getUrl())
+        Feed feed = feedRepository.findByUrl(blog.getUrl())
                 .orElseThrow(FeedNotFoundException::new);
-        putAllPostsOfBlog(blog, syndFeed);
+        putAllPostsOfBlog(blog, feed);
     }
 
     @Transactional
@@ -74,10 +75,10 @@ public class BlogService {
 //        List<SyndEntry> entries = syndFeed.getEntries();
 
         feedItems.stream()
-                .map(e -> Post.of(e.getTitle(), e.getLink(), blog)) //Blog-Post 연관관계등록
-                .toList();
+                .forEach(e -> Post.of(e.getTitle(), e.getUrl(), blog)); //Blog-Post 연관관계등록
 
-        LocalDateTime localDateTime = feed.getLastPublishdLocalDateTime();
+
+        LocalDateTime localDateTime = feed.getLastPublishdDate();
         blog.updateLastPublishedDate(localDateTime);
         return blog;
     }
@@ -90,14 +91,17 @@ public class BlogService {
                 .map(Subscription::getBlog).toList();
 
         for (Blog blog : blogs) {
-            SyndFeed syndFeed = feedRepository.findByUrl(blog.getUrl())
+            Feed feed = feedRepository.findByUrl(blog.getUrl())
                     .orElseThrow(FeedNotFoundException::new);
-            LocalDateTime lastPublishdLocalDateTime = getLastPublishdLocalDateTime(syndFeed);
+            LocalDateTime lastPublishdLocalDateTime = feed.getLastPublishdDate();
+
             boolean isUpdated = blog.isUpdated(lastPublishdLocalDateTime);
-            blog = isUpdated ? putAllPostsOfBlog(blog, syndFeed) : blog;
+            blog = isUpdated ? putAllPostsOfBlog(blog, feed) : blog;
 
             String author = blog.getAuthor();
             URL url = blog.getUrl();
+            feed.getLastPublishedFeedItem();
+
             URL lastPublishedUrl = getLastPublishdUrl(syndFeed);
 
             blogResponses.add(

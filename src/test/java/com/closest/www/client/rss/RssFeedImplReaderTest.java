@@ -16,9 +16,9 @@ import java.net.URL;
 import java.util.List;
 
 @SpringBootTest
-class RssFeedReaderTest {
+class RssFeedImplReaderTest {
 
-    private static final Logger log = LoggerFactory.getLogger(RssFeedReaderTest.class);
+    private static final Logger log = LoggerFactory.getLogger(RssFeedImplReaderTest.class);
 
     @Autowired
     private RssFeedReader rssFeedReader;
