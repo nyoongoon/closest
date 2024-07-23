@@ -1,5 +1,7 @@
 package com.closest.www.client.rss;
 
+import com.closest.www.domain.feed.Feed;
+import com.closest.www.domain.feed.FeedItem;
 import com.closest.www.domain.feed.RssFeedReader;
 import com.closest.www.domain.feed.exception.FeedNotFoundException;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -16,9 +18,9 @@ import java.net.URL;
 import java.util.List;
 
 @SpringBootTest
-class RssFeedReaderTest {
+class RssFeedImplReaderTest {
 
-    private static final Logger log = LoggerFactory.getLogger(RssFeedReaderTest.class);
+    private static final Logger log = LoggerFactory.getLogger(RssFeedImplReaderTest.class);
 
     @Autowired
     private RssFeedReader rssFeedReader;
@@ -27,17 +29,13 @@ class RssFeedReaderTest {
     @DisplayName("RssFeed 테스트")
     void test1() throws MalformedURLException {
         URL url = new URL("https://jojoldu.tistory.com/rss");
-        SyndFeed syndFeed = rssFeedReader.findByUrl(url).orElseThrow(FeedNotFoundException::new);
-//        log.info("result : {}" , syndFeed);
-        List<SyndEntry> entries = syndFeed.getEntries();
-        SyndEntry syndEntry = entries.get(0);
-//        log.info("syndEntry : {} ", syndEntry);
-        for (SyndEntry entry : entries) {
-            log.info("link : {}", entry.getLink());
-            log.info("title : {}", entry.getTitle());
-            log.info("publishedDate : {}", entry.getPublishedDate());
-        }
+        Feed feed = rssFeedReader.findByUrl(url).orElseThrow(FeedNotFoundException::new);
+        List<FeedItem> items = feed.getFeedItems();
 
-//        log.info("size : {}", entries.size());
+        for (FeedItem feedItem : items) {
+            log.info("URL : {}", feedItem.getUrl());
+            log.info("title : {}", feedItem.getTitle());
+            log.info("publishedDate : {}", feedItem.getPublishedDate());
+        }
     }
 }

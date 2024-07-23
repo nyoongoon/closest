@@ -4,9 +4,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-@Component
-public class CustomUserDetailService implements UserDetailsService {
+@Component(value = "userDetailsService")
+public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserDetailsRepository userDetailsRepository;
     // 이슈 -> MemberRespository 의존성
@@ -15,7 +14,7 @@ public class CustomUserDetailService implements UserDetailsService {
     // 2. 상속관계 ?
 
 
-    public CustomUserDetailService(UserDetailsRepository userDetailsRepository) {
+    public CustomUserDetailsService(UserDetailsRepository userDetailsRepository) {
         this.userDetailsRepository = userDetailsRepository;
     }
 

@@ -16,30 +16,25 @@ public class BlogDomainImpl {
         this.postRepository = postRepository;
     }
 
-    @Override
     public Blog findById(Long id) {
         return blogRepository.findById(id)
                 .orElseThrow(()-> new BlogNotFoundException());
     }
 
-    @Override
     public boolean existsByUrl(URL url) {
         return blogRepository.existsByUrl(url);
     }
 
-    @Override
     public Blog findBlogByUrl(URL url) {
         return blogRepository.findByUrl(url)
                 .orElseThrow(() -> new BlogNotFoundException());
     }
 
-    @Override
     public Blog findBlogByIdWithPostUsingFetchJoin(Long id) {
         return blogRepository.findBlogByIdWithPostUsingFetchJoin(id)
                 .orElseThrow(() -> new BlogNotFoundException());
     }
 
-    @Override
     public Blog saveByUrlAndAuthor(URL url, String author) {
         Blog blog = new Blog.Builder()
                 .url(url)
@@ -48,7 +43,6 @@ public class BlogDomainImpl {
         return blogRepository.save(blog);
     }
 
-    @Override
     public void clearPosts(Blog blog) {
         postRepository.deleteAllByBlog(blog);
     }

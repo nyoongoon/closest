@@ -3,14 +3,10 @@ package com.closest.www.api.service.blog;
 import com.closest.www.api.controller.blog.response.BlogResponse;
 import com.closest.www.domain.blog.Blog;
 import com.closest.www.domain.blog.BlogRepository;
-import com.closest.www.domain.feed.Feed;
-import com.closest.www.domain.feed.FeedItem;
-import com.closest.www.domain.feed.FeedRepository;
+import com.closest.www.domain.feed.*;
 import com.closest.www.domain.feed.exception.FeedNotFoundException;
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberRepository;
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -21,9 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +62,7 @@ class BlogServiceTest {
         URL url = new URL("https://goalinnext.tistory.com/rss");
         Feed feed = feedRepository.findByUrl(url)
                 .orElseThrow(FeedNotFoundException::new);
-        Blog blog = Blog.create(url, feed);
+        Blog blog = Blog.create(url, feed.getAuthor(), feed.getLastPublishdDate());
         blogRepository.save(blog);
 
         // when
@@ -80,7 +73,7 @@ class BlogServiceTest {
     }
 
     @Test
-    @DisplayName("블로그에 포스트 업데이트 시 최근 발생시간이 업데이트 된다.")
+    @DisplayName("블로그에 포스트 업데이트 시 최근 발행시간이 업데이트 된다.")
     @Transactional
     void test3() throws MalformedURLException {
         // given
@@ -89,18 +82,16 @@ class BlogServiceTest {
                 .orElseThrow(FeedNotFoundException::new);
         Blog blog = Blog.create(
                 url,
-                feed
+                feed.getAuthor(),
+                feed.getLastPublishdDate()
         );
         blogRepository.save(blog);
         // when
         blogService.putAllPostsOfBlog(blog, feed);
         // then
-        List<FeedItem> feedItems = feed.getFeedItems();
-        Date publishedDate = feedItems.get(0).getPublishedDate();
-        LocalDateTime localDateTime = publishedDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        assertThat(blog.getLastPublishedLocalDateTime()).isEqualTo(localDateTime);
+        FeedItem lastPublishedFeedItem = feed.getLastPublishedFeedItem();
+        assertThat(blog.getLastPublishedDate())
+                .isEqualTo(lastPublishedFeedItem.getPublishedDate());
     }
 
     @Test
@@ -113,7 +104,7 @@ class BlogServiceTest {
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
-        memberService.regist(member);
+        memberRepository.save(member);
         URL link1 = new URL("https://goalinnext.tistory.com/rss");
         blogService.memberSubscriptsBlog(userEmail, link1);
         URL link2 = new URL("https://jojoldu.tistory.com/rss");

@@ -3,6 +3,8 @@ package com.closest.www.domain.post;
 import com.closest.www.domain.blog.Blog;
 import jakarta.persistence.*;
 
+import java.net.URL;
+
 @Entity
 @Table(name = "post")
 public class Post {
@@ -14,7 +16,7 @@ public class Post {
     private String title;
 
     @Column(nullable = false, unique = true)
-    private String link;
+    private URL url;
 
     @ManyToOne
     @JoinColumn(name = "blog_id")
@@ -23,13 +25,13 @@ public class Post {
     protected Post() {
     }
 
-    private Post(String title, String link) {
+    private Post(String title, URL url) {
         this.title = title;
-        this.link = link;
+        this.url = url;
     }
 
-    public static Post of(String title, String link, Blog blog) {
-        Post post = new Post(title, link);
+    public static Post of(String title, URL url, Blog blog) {
+        Post post = new Post(title, url);
         post.setBlog(blog);
         return post;
     }

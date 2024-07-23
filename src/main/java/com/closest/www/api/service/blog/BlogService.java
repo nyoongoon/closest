@@ -14,14 +14,13 @@ import com.closest.www.domain.member.MemberRepository;
 import com.closest.www.domain.post.Post;
 import com.closest.www.domain.post.PostRepository;
 import com.closest.www.domain.subscription.Subscription;
-import com.rometools.rome.feed.synd.SyndFeed;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -54,16 +53,16 @@ public class BlogService {
                     .orElseThrow(FeedNotFoundException::new);
             blog = Blog.create(
                     url,
-                    feed // todo 검증하기 -> LocalDate -> LocalDateTime으로 변환시 시간은 기본값으로 강제 설정 아닌가? 의미가 없지 않나?
+                    feed.getAuthor(), // todo 검증하기 -> LocalDate -> LocalDateTime으로 변환시 시간은 기본값으로 강제 설정 아닌가? 의미가 없지 않나?
+                    feed.getLastPublishdDate()
             );
-//            blog = blogDomain.saveByUrlAndAuthor(url, syndFeed.getAuthor());
         }
 
-        Subscription.create(member, blog); //persistence cascade
+        Subscription.create(member, blog);
 
-        SyndFeed syndFeed = feedRepository.findByUrl(blog.getUrl())
+        Feed feed = feedRepository.findByUrl(blog.getUrl())
                 .orElseThrow(FeedNotFoundException::new);
-        putAllPostsOfBlog(blog, syndFeed);
+        putAllPostsOfBlog(blog, feed);
     }
 
     @Transactional
@@ -71,14 +70,12 @@ public class BlogService {
         postRepository.deleteAllByBlog(blog);
 
         List<FeedItem> feedItems = feed.getFeedItems();
-//        List<SyndEntry> entries = syndFeed.getEntries();
 
         feedItems.stream()
-                .map(e -> Post.of(e.getTitle(), e.getLink(), blog)) //Blog-Post 연관관계등록
-                .toList();
+                .forEach(e -> Post.of(e.getTitle(), e.getUrl(), blog)); //Blog-Post 연관관계등록
 
-        LocalDateTime localDateTime = feed.getLastPublishdLocalDateTime();
-        blog.updateLastPublishedDate(localDateTime);
+        Date lastPublishdDate = feed.getLastPublishdDate();
+        blog.updateLastPublishedDate(lastPublishdDate);
         return blog;
     }
 
@@ -90,15 +87,20 @@ public class BlogService {
                 .map(Subscription::getBlog).toList();
 
         for (Blog blog : blogs) {
-            SyndFeed syndFeed = feedRepository.findByUrl(blog.getUrl())
+            Feed feed = feedRepository.findByUrl(blog.getUrl())
                     .orElseThrow(FeedNotFoundException::new);
-            LocalDateTime lastPublishdLocalDateTime = getLastPublishdLocalDateTime(syndFeed);
-            boolean isUpdated = blog.isUpdated(lastPublishdLocalDateTime);
-            blog = isUpdated ? putAllPostsOfBlog(blog, syndFeed) : blog;
+            Date lastPublishdDate = feed.getLastPublishdDate();
+
+            //todo updated 로직 수정 필요..
+            boolean isUpdated = blog.isUpdated(lastPublishdDate);
+
+            blog = isUpdated ? putAllPostsOfBlog(blog, feed) : blog;
 
             String author = blog.getAuthor();
             URL url = blog.getUrl();
-            URL lastPublishedUrl = getLastPublishdUrl(syndFeed);
+            FeedItem lastFeedItem = feed.getLastPublishedFeedItem();
+
+            URL lastPublishedUrl = lastFeedItem.getUrl();
 
             blogResponses.add(
                     BlogResponse.of(author, url, isUpdated, lastPublishedUrl)
@@ -106,10 +108,5 @@ public class BlogService {
         }
 
         return blogResponses;
-    }
-
-    private URL getLastPublishdUrl(SyndFeed syndFeed) throws MalformedURLException {
-        String link = syndFeed.getEntries().get(0).getLink();//정렬이 되어 있음
-        return new URL(link);
     }
 }

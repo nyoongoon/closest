@@ -3,7 +3,7 @@ package com.closest.www.api.controller.blog;
 import com.closest.www.api.config.MockUser;
 import com.closest.www.api.controller.blog.request.AddBlogRequest;
 import com.closest.www.domain.member.Member;
-import com.closest.www.api.service.member.MemberService;
+import com.closest.www.domain.member.MemberRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class BlogControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private MemberService memberService;
+    private MemberRepository memberRepository;
 
     @Test
     @MockUser()
@@ -44,7 +44,7 @@ class BlogControllerTest {
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
-        memberService.regist(member);
+        memberRepository.save(member);
         String link = "https://goalinnext.tistory.com";
 
         AddBlogRequest request = AddBlogRequest.of(
@@ -62,7 +62,8 @@ class BlogControllerTest {
                 .andExpect(status().isOk());
 
         URL url = new URL(link);
-        Member foundMember = memberService.findMemberByUserEmail(userEmail);
+        Member foundMember = memberRepository.findByUserEmail(userEmail)
+                .orElseThrow();
         foundMember.getSubscriptions().stream()
                 .filter(e -> e.getBlog().getUrl().equals(url))
                 .findAny()

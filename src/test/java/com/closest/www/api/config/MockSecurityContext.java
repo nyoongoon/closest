@@ -2,6 +2,7 @@ package com.closest.www.api.config;
 
 import com.closest.www.domain.member.Member;
 import com.closest.www.api.service.member.MemberService;
+import com.closest.www.domain.member.MemberRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -14,10 +15,10 @@ import java.util.List;
  * 테스트용 스프링 시큐리티 컨텍스트에 Authentication 추가
  */
 public class MockSecurityContext implements WithSecurityContextFactory<MockUser> {
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
-    public MockSecurityContext(MemberService memberService) {
-        this.memberService = memberService;
+    public MockSecurityContext(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -26,8 +27,7 @@ public class MockSecurityContext implements WithSecurityContextFactory<MockUser>
                 .userEmail(annotation.email())
                 .password(annotation.password())
                 .build();
-        memberService.regist(member);
-
+        memberRepository.save(member);
 
         var userRole = new SimpleGrantedAuthority("ROLE_USER");
         var auth = new UsernamePasswordAuthenticationToken(
