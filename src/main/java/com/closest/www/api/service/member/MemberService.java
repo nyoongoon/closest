@@ -1,18 +1,18 @@
 package com.closest.www.api.service.member;
 
-import com.closest.www.config.configuration.CustomUserDetailsService;
-import com.closest.www.domain.member.MemberRepository;
 import org.springframework.stereotype.Service;
 
 /**
  * Member 도메인 서비스 구현 클래스
  */
 @Service
-public class MemberService extends CustomUserDetailsService { // todo..
-    private final MemberRepository memberRepository;
+public class MemberService  { // todo..
 
-    public MemberService(MemberRepository memberRepository) {
-        super(memberRepository);
-        this.memberRepository = memberRepository;
-    }
+//   private final MemberRepository memberRepository;
+//
+//    public ServiceImpl(MemberRepository memberRepository) {
+//        this.memberRepository = memberRepository;
+//    }
+
+
 }

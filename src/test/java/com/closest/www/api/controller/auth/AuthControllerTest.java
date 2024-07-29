@@ -1,7 +1,7 @@
 package com.closest.www.api.controller.auth;
 
 import com.closest.www.api.service.auth.AuthService;
-import com.closest.www.config.configuration.SecurityConfiguration;
+import com.closest.www.config.configuration.SecurityConfig;
 import com.closest.www.config.filter.JwtAuthenticationFilter;
 import com.closest.www.utility.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * UserDetailService의 repository는 목으로 해볼 수 있지 않을까..?
  */
-@Import({SecurityConfiguration.class,
+@Import({SecurityConfig.class,
         JwtAuthenticationFilter.class,
         JwtTokenProvider.class})
 @WebMvcTest(AuthController.class)

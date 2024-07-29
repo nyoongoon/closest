@@ -1,7 +1,6 @@
 package com.closest.www.api.config;
 
 import com.closest.www.domain.member.Member;
-import com.closest.www.api.service.member.MemberService;
 import com.closest.www.domain.member.MemberRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

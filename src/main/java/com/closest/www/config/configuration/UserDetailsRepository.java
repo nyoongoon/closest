@@ -1,11 +1,11 @@
 package com.closest.www.config.configuration;
 
-import org.springframework.security.core.userdetails.UserDetails;
+import com.closest.www.domain.member.Member;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
 public interface UserDetailsRepository {
-    Optional<UserDetails> findByUsername(String username);
+    Optional<Member> findByUserEmail(String userEmail);
 }
