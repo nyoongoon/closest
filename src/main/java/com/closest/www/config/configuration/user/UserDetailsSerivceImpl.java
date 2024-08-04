@@ -1,4 +1,4 @@
-package com.closest.www.config.configuration;
+package com.closest.www.config.configuration.user;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,7 +16,7 @@ public class UserDetailsSerivceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.userDetailsRepository.findByUserEmail(username)
+        return this.userDetailsRepository.findByUsername(username)
                 .orElseThrow();
     }
 }

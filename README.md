@@ -25,3 +25,7 @@
 - rss에서 전달받은 SyndEntry와 SyndFeed의 기능을 외부 노출 하지 않기 위해 private 필드로 받고 
 - Feed, FeedItem 인터페이스로 사용할 기능만 외부 노출시킴
 - 상속을 하지 않아 불필요하게 SyndEntry나 SyndFeed의 타입으로 받게 될 경우를 차단
+
+
+# UserDetails
+![](uml/userDetails.png)
