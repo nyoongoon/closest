@@ -60,8 +60,9 @@ public class SecurityConfig {
                 .csrf(CsrfConfigurer::disable) // -> rest api
                 .sessionManagement(configurer -> configurer
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  //jwt는 세션을 갖지 않음
-                .authorizeHttpRequests((auth) -> auth
-                        .anyRequest().permitAll()) // --> 이슈해결 이것 없으면 PreAuthorize 적용 안됐음
+                .authorizeHttpRequests((request) ->
+                        request
+                                .anyRequest().permitAll()) // --> 이슈해결 이것 없으면 PreAuthorize 적용 안됐음
                 .addFilterBefore(this.jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -76,7 +77,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

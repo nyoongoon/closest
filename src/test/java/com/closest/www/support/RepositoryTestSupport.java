@@ -4,8 +4,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 
-@Import(DataJpaTestConfiguration.class)
+@Import(RepositoryTestConfiguration.class)
 @DataJpaTest
-public class DataJpaTestSupport {
+public class RepositoryTestSupport {
 
 }

@@ -1,5 +1,6 @@
 package com.closest.www.api.controller.auth;
 
+import com.closest.www.api.ApiResponse;
 import com.closest.www.api.controller.auth.request.SignRequest;
 import com.closest.www.api.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,9 +24,10 @@ public class AuthController {
      * @return
      */
     @PostMapping("/signup")
-    public ResponseEntity signup(@RequestBody SignRequest.SignUp signUp) {
+    public ApiResponse<Void> signup(@RequestBody SignRequest.SignUp signUp) {
         this.authService.signup(signUp);
-        return ResponseEntity.ok().build();
+        ApiResponse<Void> ok = ApiResponse.ok();
+        return ok;
     }
 
     /**
@@ -38,10 +40,10 @@ public class AuthController {
      * @return
      */
     @PostMapping("/signin")
-    public ResponseEntity signin(@RequestBody SignRequest.SignIn signIn,
+    public ApiResponse<Void> signin(@RequestBody SignRequest.SignIn signIn,
                                  HttpServletResponse response) {
         authService.signin(signIn, response);
-        return ResponseEntity.ok().build();
+        return ApiResponse.ok();
     }
 
     @PreAuthorize("hasRole('READ')")

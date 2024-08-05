@@ -3,11 +3,10 @@ package com.closest.www.config.configuration.user;
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberRepository;
 import com.closest.www.domain.member.MemberUserDetailsRepositoryImpl;
-import com.closest.www.support.DataJpaTestSupport;
+import com.closest.www.support.RepositoryTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,7 +16,7 @@ import static com.closest.www.domain.member.MemberAuthority.ROLE_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-class MemberUserDetailsRepositoryImplTest extends DataJpaTestSupport {
+class MemberUserDetailsRepositoryImplTest extends RepositoryTestSupport {
 
     @Autowired
     private MemberUserDetailsRepositoryImpl memberUserDetailsRepositoryImpl;

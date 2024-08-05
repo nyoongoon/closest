@@ -43,7 +43,7 @@ public class JwtTokenProvider {
     @Value("{spring.jwt.refresh-secret-key}")
     private String refreshSecretKey;
 
-    public JwtTokenProvider(UserDetailsService userDetailsService) {
+        public JwtTokenProvider(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 

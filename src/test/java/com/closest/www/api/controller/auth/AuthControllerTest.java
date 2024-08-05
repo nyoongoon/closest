@@ -3,6 +3,8 @@ package com.closest.www.api.controller.auth;
 import com.closest.www.api.service.auth.AuthService;
 import com.closest.www.config.configuration.SecurityConfig;
 import com.closest.www.config.filter.JwtAuthenticationFilter;
+import com.closest.www.support.ControllerTestSupport;
+import com.closest.www.support.mock.MockUser;
 import com.closest.www.utility.jwt.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -21,28 +23,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static com.closest.www.api.controller.auth.request.SignRequest.SignIn;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignUp;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 /**
  * UserDetailService의 repository는 목으로 해볼 수 있지 않을까..?
  */
-@Import({SecurityConfig.class,
-        JwtAuthenticationFilter.class,
-        JwtTokenProvider.class})
-@WebMvcTest(AuthController.class)
-class AuthControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
-    private AuthService authService;
+//@Import({SecurityConfig.class,
+//        JwtAuthenticationFilter.class,
+//        JwtTokenProvider.class})
+//@WebMvcTest(AuthController.class)
+class AuthControllerTest extends ControllerTestSupport {
+
 
 
     @DisplayName("이메일과 비밀번호, 확인 비밀번호로 회원가입을 신청 한다.")
     @Test
-    @Transactional
-    void signin() throws Exception {
+    void signup() throws Exception {
         //given
         SignUp signUp = new SignUp(
                 "abcd",
@@ -62,7 +59,6 @@ class AuthControllerTest {
 
     @DisplayName("이메일과 비밀번호로 로그인을 진행한다.")
     @Test
-    @Transactional
     void siginin() throws Exception {
         // given
         SignUp signUp = new SignUp(
@@ -92,7 +88,6 @@ class AuthControllerTest {
 
 
     @DisplayName("올바른 엑세스 토큰으로 성공 요청을 받는다.")
-    @Transactional
     @Test
     void requestWithRightAccessToken() throws Exception {
         // given
@@ -115,7 +110,6 @@ class AuthControllerTest {
 
     @DisplayName("조작된 엑세스 토큰을 전달하면 에러가 발생한다.")
     @Test
-    @Transactional
     void requestWithNotValidAccessToken() throws Exception {
         // given
 //        SignUp signUp = new SignUp.Builder()
@@ -157,7 +151,6 @@ class AuthControllerTest {
 
     @DisplayName("엑세스 토큰이 만료되었을 경우 리프레시 토큰으로 엑세스 토큰을 재발급 받는다.")
     @Test
-    @Transactional
     void requestWithRefreshToken() throws Exception {
         //given
 //        SignUp signUp = new SignUp.Builder()

@@ -1,4 +1,4 @@
-package com.closest.www.api.config;
+package com.closest.www.support.mock;
 
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberRepository;
@@ -14,11 +14,6 @@ import java.util.List;
  * 테스트용 스프링 시큐리티 컨텍스트에 Authentication 추가
  */
 public class MockSecurityContext implements WithSecurityContextFactory<MockUser> {
-    private final MemberRepository memberRepository;
-
-    public MockSecurityContext(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
 
     @Override
     public SecurityContext createSecurityContext(MockUser annotation) {
@@ -26,7 +21,6 @@ public class MockSecurityContext implements WithSecurityContextFactory<MockUser>
                 .userEmail(annotation.email())
                 .password(annotation.password())
                 .build();
-        memberRepository.save(member);
 
         var userRole = new SimpleGrantedAuthority("ROLE_USER");
         var auth = new UsernamePasswordAuthenticationToken(

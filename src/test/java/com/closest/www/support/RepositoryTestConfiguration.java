@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class DataJpaTestConfiguration {
+public class RepositoryTestConfiguration {
     @PersistenceContext
     private EntityManager entityManager;
 
