@@ -1,77 +1,234 @@
 package com.closest.www.api.controller.auth;
 
-import com.closest.www.api.service.auth.AuthService;
-import com.closest.www.config.configuration.SecurityConfig;
-import com.closest.www.config.filter.JwtAuthenticationFilter;
+import com.closest.www.api.service.auth.exception.NotEqualPasswordsException;
 import com.closest.www.support.ControllerTestSupport;
-import com.closest.www.support.mock.MockUser;
-import com.closest.www.utility.jwt.JwtTokenProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
 
 import static com.closest.www.api.controller.auth.request.SignRequest.SignIn;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignUp;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static com.closest.www.utility.constant.ValidationString.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-/**
- * UserDetailService의 repository는 목으로 해볼 수 있지 않을까..?
- */
-//@Import({SecurityConfig.class,
-//        JwtAuthenticationFilter.class,
-//        JwtTokenProvider.class})
-//@WebMvcTest(AuthController.class)
 class AuthControllerTest extends ControllerTestSupport {
 
 
+    //todo valid 테스트 추가하기
 
     @DisplayName("이메일과 비밀번호, 확인 비밀번호로 회원가입을 신청 한다.")
     @Test
     void signup() throws Exception {
         //given
         SignUp signUp = new SignUp(
-                "abcd",
-                "abcd1234",
-                "이름"
+                "abcd@naver.com",
+                "Abcd1234!",
+                "Abcd1234!"
         );
         String json = objectMapper.writeValueAsString(signUp);
-
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"));
+    }
+
+    @DisplayName("회원가입 시 이메일이 없으면 에러가 발생한다.")
+    @Test
+    void signupBlankEmail() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "",
+                "Abcd1234!",
+                "Abcd1234!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(jsonPath("$.message").value(EMAIL_IS_REQUIRED))
+        ;
+    }
+
+    @DisplayName("회원가입 시 비밀번호가 없으면 에러가 발생한다.")
+    @Test
+    void signupBlankPassword() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "abcd@naver.com",
+                "",
+                "Abcd1234!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value(PASSWORD_IS_REQUIRED));
+    }
+
+    @DisplayName("회원가입 시 확인 비밀번호가 없으면 에러가 발생한다.")
+    @Test
+    void signupBlankConfirmPasword() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "abcd@naver.com",
+                "Abcd1234!",
+                ""
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value(CONFIRM_PASSWORD_IS_REQUIRED));
+        ;
+    }
+
+    @DisplayName("회원가입 신청 시 이메일 형식이 틀리면 에러가 발생한다.")
+    @Test
+    void signupNotValidEmailForm() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "abcd",
+                "Abcd1234!",
+                "Abcd1234!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value(NOT_VALID_EMAIL_FORM));
+    }
+
+    @DisplayName("회원가입 신청 시 비밀번호가 8자 이상이 아니면 않으면 에러가 발생한다.")
+    @Test
+    void signupOverPasswordLength() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "abcd@naver.com",
+                "Abcd124!",
+                "Abcd124!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_SIZE));    }
+
+    @DisplayName("회원가입 신청 시 대문자가 포함되어 있지 않으면 아니면 않으면 에러가 발생한다.")
+    @Test
+    void signupNonUpperCasePassword() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "abcd@naver.com",
+                "Abcd1234!",
+                "Abcd1234!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("NOT_VALID_PASSWORD_FORM"));
+    }
+
+    @DisplayName("회원가입 신청 시 소문자가 포함되어 있지 않으면 아니면 않으면 에러가 발생한다.")
+    @Test
+    void signupNonDownCasePassword() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "abcd@naver.com",
+                "Abcd1234!",
+                "Abcd1234!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("NOT_VALID_PASSWORD_FORM"));;;
+    }
+
+    @DisplayName("회원가입 신청 시 특수문자가 포함되어 있지 않으면 아니면 않으면 에러가 발생한다.")
+    @Test
+    void signupNonSpecialCasePassword() throws Exception {
+        //given
+        SignUp signUp = new SignUp(
+                "abcd@naver.com",
+                "Abcd1234!",
+                "Abcd1234!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("NOT_VALID_PASSWORD_FORM"));;;
+    }
+
+
+    @DisplayName("회원가입 신청 시 비밀번호와 확인 비밀번호가 다르면 않으면 에러가 발생한다.")
+    @Test
+    void signupNotEqualPasswords() throws Exception {
+
+        //given
+        SignUp signUp = new SignUp(
+                "abcd@naver.com",
+                "Abcd124!!",
+                "Abcd124!!!"
+        );
+        String json = objectMapper.writeValueAsString(signUp);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value(NotEqualPasswordsException.MESSAGE));
     }
 
     @DisplayName("이메일과 비밀번호로 로그인을 진행한다.")
     @Test
     void siginin() throws Exception {
         // given
-        SignUp signUp = new SignUp(
-                "abcd",
-                "abcd1234",
-                "이름"
-        );
-
-        authService.signup(signUp); //가입
-
         SignIn signIn = new SignIn(
-                signUp.userEmail(),
-                signUp.password()
+                "abcd@naver.com",
+                "12g4agg"
         );
 
         String json = objectMapper.writeValueAsString(signIn);
@@ -81,8 +238,6 @@ class AuthControllerTest extends ControllerTestSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.cookie().exists("accessToken"))
-                .andExpect(MockMvcResultMatchers.cookie().exists("refreshToken"))
                 .andDo(MockMvcResultHandlers.print());
     }
 

@@ -17,4 +17,9 @@ public class TokenExpiredException extends AbstractException {
     public HttpStatus getHttpStatus() {
         return HttpStatus.UNAUTHORIZED;
     }
+
+    @Override
+    public String getMessage() {
+        return MESSAGE;
+    }
 }

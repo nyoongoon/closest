@@ -1,5 +1,6 @@
 package com.closest.www.api.controller.auth.request;
 
+import com.closest.www.api.service.auth.exception.NotEqualPasswordsException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -9,19 +10,6 @@ import static com.closest.www.utility.constant.Regex.PASSWORD;
 import static com.closest.www.utility.constant.ValidationString.*;
 
 public record SignRequest() {
-
-    public record SignIn(
-            @NotBlank(message = EMAIL_IS_REQUIRED)
-            @Email(message = NOT_VALID_EMAIL_FORM)
-            String userEmail,
-
-            @NotBlank(message = PASSWORD_IS_REQUIRED)
-            @Pattern(regexp = PASSWORD, message = NOT_VALID_PASSWORD_FORM)
-            @Size(min = 8, max = 64, message = NOT_VALID_PASSWORD_SIZE)
-            String password
-    ) {
-
-    }
 
     public record SignUp(
             @NotBlank(message = EMAIL_IS_REQUIRED)
@@ -38,6 +26,22 @@ public record SignRequest() {
             @Size(min = 8, max = 64, message = NOT_VALID_CONFIRM_PASSWORD_SIZE)
             String confirmPassword
     ) {
+        public SignUp {
+            if(!password.equals(confirmPassword)){
+                throw new NotEqualPasswordsException();
+            }
+        }
+    }
 
+    public record SignIn(
+            @NotBlank(message = EMAIL_IS_REQUIRED)
+            @Email(message = NOT_VALID_EMAIL_FORM)
+            String userEmail,
+
+            @NotBlank(message = PASSWORD_IS_REQUIRED)
+            @Pattern(regexp = PASSWORD, message = NOT_VALID_PASSWORD_FORM)
+            @Size(min = 8, max = 64, message = NOT_VALID_PASSWORD_SIZE)
+            String password
+    ) {
     }
 }

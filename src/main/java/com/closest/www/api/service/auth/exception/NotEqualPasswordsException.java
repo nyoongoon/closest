@@ -3,19 +3,16 @@ package com.closest.www.api.service.auth.exception;
 import com.closest.www.api.AbstractException;
 import org.springframework.http.HttpStatus;
 
-/**
- * 존재하지 않는 회원 예외 클래스
- */
-public class MemberNotFoundException extends AbstractException {
-    private static final String MESSAGE = "존재하지 않는 회원입니다.";
+public class NotEqualPasswordsException extends AbstractException {
+    private static final String MESSAGE = "비밀번호와 확인 비밀번호가 다릅니다.";
 
-    public MemberNotFoundException() {
+    public NotEqualPasswordsException() {
         super(MESSAGE);
     }
 
     @Override
     public HttpStatus getHttpStatus() {
-        return HttpStatus.NOT_FOUND;
+        return HttpStatus.BAD_REQUEST;
     }
 
     @Override
@@ -23,4 +20,3 @@ public class MemberNotFoundException extends AbstractException {
         return MESSAGE;
     }
 }
-
