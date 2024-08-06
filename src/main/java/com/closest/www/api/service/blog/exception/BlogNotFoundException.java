@@ -14,9 +14,4 @@ public class BlogNotFoundException extends AbstractException {
     public HttpStatus getHttpStatus() {
         return HttpStatus.NOT_FOUND;
     }
-
-    @Override
-    public String getMessage() {
-        return MESSAGE;
-    }
 }

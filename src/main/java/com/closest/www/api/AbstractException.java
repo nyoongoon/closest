@@ -19,8 +19,6 @@ public abstract class AbstractException extends RuntimeException{
 
     public abstract HttpStatus getHttpStatus();
 
-    public abstract String getMessage();
-
     public void addValidation(String fieldName, String message){
         this.validation.put(fieldName, message);
     }

@@ -17,9 +17,4 @@ public class FeedNotFoundException extends AbstractException {
     public HttpStatus getHttpStatus() {
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
-
-    @Override
-    public String getMessage() {
-        return MESSAGE;
-    }
 }

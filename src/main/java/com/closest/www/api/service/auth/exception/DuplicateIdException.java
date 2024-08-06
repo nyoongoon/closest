@@ -15,9 +15,4 @@ public class DuplicateIdException extends AbstractException {
     public HttpStatus getHttpStatus() {
         return HttpStatus.BAD_REQUEST;
     }
-
-    @Override
-    public String getMessage() {
-        return MESSAGE;
-    }
 }
