@@ -1,7 +1,8 @@
 package com.closest.www.api.controller.auth;
 
 import com.closest.www.api.ApiResponse;
-import com.closest.www.api.controller.auth.request.SignRequest;
+import com.closest.www.api.controller.auth.request.SignRequest.SignInRequest;
+import com.closest.www.api.controller.auth.request.SignRequest.SignUpRequest;
 import com.closest.www.api.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -20,12 +21,12 @@ public class AuthController {
     /**
      * 회원가입
      *
-     * @param signUp
+     * @param signUpRequest
      * @return
      */
     @PostMapping("/signup")
-    public ApiResponse<Void> signup(@Valid @RequestBody SignRequest.SignUp signUp) {
-        this.authService.signup(signUp);
+    public ApiResponse<Void> signup(@Valid @RequestBody SignUpRequest signUpRequest) {
+        this.authService.signup(signUpRequest.toServiceRequest());
         return ApiResponse.ok();
     }
 
@@ -34,14 +35,14 @@ public class AuthController {
      * <p>
      * 엑세스 토큰은 응답바디에, 리프레시 토큰은 쿠키에 저장
      *
-     * @param signIn
+     * @param signInRequest
      * @param response
      * @return
      */
     @PostMapping("/signin")
-    public ApiResponse<Void> signin(@Valid @RequestBody SignRequest.SignIn signIn,
+    public ApiResponse<Void> signin(@Valid @RequestBody SignInRequest signInRequest,
                                     HttpServletResponse response) {
-        authService.signin(signIn, response);
+        authService.signin(signInRequest.toServiceRequest(), response);
         return ApiResponse.ok();
     }
 

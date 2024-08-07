@@ -28,18 +28,18 @@ public class ControllerExceptionAdvice {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResponse<String> bindException(MethodArgumentNotValidException e) {
+    public <T> ResponseEntity<ApiResponse<T>> bindException(MethodArgumentNotValidException e) {
 
-        ApiResponse errorResponse = ApiResponse.error(
+        ApiResponse<T> errorResponse = ApiResponse.error(
                 (HttpStatus) e.getStatusCode(),
                 // 첫 번째 에러의 메시지 꺼내기..
-                "잘못된 요청입니다."
+                e.getFieldErrors().getFirst().getDefaultMessage()
         );
 
         for (FieldError fieldError : e.getFieldErrors()) {
             errorResponse.addValidation(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
-        return errorResponse;
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 }

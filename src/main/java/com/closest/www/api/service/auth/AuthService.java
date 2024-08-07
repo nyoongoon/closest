@@ -1,9 +1,13 @@
 package com.closest.www.api.service.auth;
 
 import com.closest.www.api.controller.auth.request.SignRequest;
+import com.closest.www.api.controller.auth.request.SignRequest.SignUpRequest;
 import com.closest.www.api.controller.auth.request.TokenDto;
 import com.closest.www.api.service.auth.exception.DuplicateIdException;
 import com.closest.www.api.service.auth.exception.MemberNotFoundException;
+import com.closest.www.api.service.auth.request.SignServiceRequest;
+import com.closest.www.api.service.auth.request.SignServiceRequest.SignInServiceRequest;
+import com.closest.www.api.service.auth.request.SignServiceRequest.SignUpServiceRequest;
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberRepository;
 import com.closest.www.domain.token.Token;
@@ -39,19 +43,21 @@ public class AuthService {
     /**
      * 가입 서비스 로직
      *
-     * @param signUp
+     * @param signUpServiceRequest
      */
     @Transactional
-    public void signup(SignRequest.SignUp signUp) {
+    public void signup(SignUpServiceRequest signUpServiceRequest) {
+        //todo 패스워드 확인 패스워드 일치 여부 판단
+
         // 존재여부 판단
-        boolean isExists = memberRepository.existsByUserEmail(signUp.userEmail());
+        boolean isExists = memberRepository.existsByUserEmail(signUpServiceRequest.userEmail());
         if (isExists) {
             throw new DuplicateIdException();
         }
         // 엔티티 변환
         Member member = Member.create(
-                signUp.userEmail(),
-                signUp.password(),
+                signUpServiceRequest.userEmail(),
+                signUpServiceRequest.password(),
                 List.of(ROLE_USER),
                 passwordEncoder
         );
@@ -62,16 +68,16 @@ public class AuthService {
     /**
      * 로그인 서비스 로직
      *
-     * @param signIn
+     * @param signInServiceRequest
      * @param response
      */
     @Transactional
-    public void signin(SignRequest.SignIn signIn, HttpServletResponse response) {
+    public void signin(SignInServiceRequest signInServiceRequest, HttpServletResponse response) {
         //멤버 조회
-        Member member = memberRepository.findByUserEmail(signIn.userEmail())
+        Member member = memberRepository.findByUserEmail(signInServiceRequest.userEmail())
                 .orElseThrow(MemberNotFoundException::new);
         // 패스워드 일치 여부
-        boolean isMatches = this.passwordEncoder.matches(signIn.password(), member.getPassword());
+        boolean isMatches = this.passwordEncoder.matches(signInServiceRequest.password(), member.getPassword());
         if (!isMatches) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
