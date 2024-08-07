@@ -1,6 +1,6 @@
 package com.closest.www.config.filter;
 
-import com.closest.www.api.service.auth.exception.TokenExpiredException;
+import com.closest.www.api.service.auth.exception.ExpiredTokenException;
 import com.closest.www.utility.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter { //OncePerReq
             this.setAuthenticationByAccessToken(accessToken);
             this.jwtTokenProvider.addAccessTokenToCookie(response, accessToken); //todo refreshToken renewal?
         } else {
-            throw new TokenExpiredException();
+            throw new ExpiredTokenException();
         }
 
         filterChain.doFilter(request, response);

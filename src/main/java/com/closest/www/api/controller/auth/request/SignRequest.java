@@ -1,6 +1,6 @@
 package com.closest.www.api.controller.auth.request;
 
-import com.closest.www.api.service.auth.exception.NotEqualPasswordsException;
+import com.closest.www.api.controller.auth.exception.NotEqualPasswordsException;
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignInServiceRequest;
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignUpServiceRequest;
 import jakarta.validation.constraints.Email;
@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import static com.closest.www.utility.constant.Regex.PASSWORD;
-import static com.closest.www.utility.constant.ValidationString.*;
+import static com.closest.www.api.controller.auth.exception.AuthControllerExceptionMessageConstants.*;
 
 public record SignRequest() {
 

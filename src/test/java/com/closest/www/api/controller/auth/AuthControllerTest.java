@@ -1,6 +1,5 @@
 package com.closest.www.api.controller.auth;
 
-import com.closest.www.api.service.auth.request.SignServiceRequest;
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignUpServiceRequest;
 import com.closest.www.api.service.blog.exception.BlogNotFoundException;
 import com.closest.www.support.ControllerTestSupport;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import static com.closest.www.api.controller.auth.request.SignRequest.SignInRequest;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignUpRequest;
-import static com.closest.www.utility.constant.ValidationString.*;
+import static com.closest.www.api.controller.auth.exception.AuthControllerExceptionMessageConstants.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -83,7 +82,7 @@ class AuthControllerTest extends ControllerTestSupport {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value(EMAIL_IS_REQUIRED));
+                .andExpect(jsonPath("$.message").value(PASSWORD_IS_REQUIRED));
     }
 
     @DisplayName("회원가입 시 확인 비밀번호가 없으면 에러가 발생한다.")
