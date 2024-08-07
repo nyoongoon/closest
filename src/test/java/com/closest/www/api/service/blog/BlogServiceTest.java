@@ -39,7 +39,7 @@ class BlogServiceTest {
     void test1() throws MalformedURLException {
         // given
         String userEmail = "abc@naver.com";
-        Member member = new Member.Builder()
+        Member member = Member.builder()
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
@@ -100,7 +100,7 @@ class BlogServiceTest {
     void test4() throws MalformedURLException {
         // given
         String userEmail = "abc@naver.com";
-        Member member = new Member.Builder()
+        Member member = Member.builder()
                 .userEmail(userEmail)
                 .password("1234")
                 .build();

@@ -40,7 +40,7 @@ class BlogControllerTest {
     void test1() throws Exception {
         // given
         String userEmail = "abc@naver.com";
-        Member member = new Member.Builder()
+        Member member = Member.builder()
                 .userEmail(userEmail)
                 .password("1234")
                 .build();

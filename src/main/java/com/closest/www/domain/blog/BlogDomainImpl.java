@@ -18,7 +18,7 @@ public class BlogDomainImpl {
 
     public Blog findById(Long id) {
         return blogRepository.findById(id)
-                .orElseThrow(()-> new BlogNotFoundException());
+                .orElseThrow(() -> new BlogNotFoundException());
     }
 
     public boolean existsByUrl(URL url) {
@@ -36,7 +36,7 @@ public class BlogDomainImpl {
     }
 
     public Blog saveByUrlAndAuthor(URL url, String author) {
-        Blog blog = new Blog.Builder()
+        Blog blog = Blog.builder()
                 .url(url)
                 .author(author)
                 .build();

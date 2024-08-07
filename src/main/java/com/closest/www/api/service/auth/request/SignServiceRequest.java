@@ -17,7 +17,7 @@ public record SignServiceRequest() {
             String password;
             String confirmPassword;
 
-            public Builder() {
+            private Builder() {
             }
 
             public SignUpServiceRequest.Builder userEmail(String userEmail) {
@@ -54,7 +54,7 @@ public record SignServiceRequest() {
             String userEmail;
             String password;
 
-            public Builder() {
+            private Builder() {
             }
 
             public SignInServiceRequest.Builder userEmail(String userEmail) {

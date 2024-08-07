@@ -35,6 +35,10 @@ public class Blog {
     protected Blog() {
     }
 
+    public static Blog.Builder builder(){
+        return new Blog.Builder();
+    }
+
     private Blog(Builder builder) {
         this.url = builder.url;
         this.author = builder.author;
@@ -46,7 +50,7 @@ public class Blog {
             String author,
             Date lastPublishedDate
     ){
-        return new Builder()
+        return Blog.builder()
                 .url(url)
                 .author(author)
                 .lastPublishedDate(lastPublishedDate)
@@ -89,9 +93,9 @@ public class Blog {
     public static final class Builder {
         private URL url;
         private String author;
-        private Date lastPublishedDate;
+        private Date lastPublishedDate; // todo 사용하지 않는 이유 찾아보기
 
-        public Builder() {
+        private Builder() {
         }
 
         public Builder url(URL url) {

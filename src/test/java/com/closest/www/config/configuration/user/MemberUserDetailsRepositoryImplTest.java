@@ -30,7 +30,7 @@ class MemberUserDetailsRepositoryImplTest extends RepositoryTestSupport {
         //given
         String userEmail = "test";
         String password = "password";
-        Member member = new Member.Builder()
+        Member member = Member.builder()
                 .userEmail(userEmail)
                 .password(password)
                 .roles(List.of(ROLE_USER))

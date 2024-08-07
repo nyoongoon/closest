@@ -17,7 +17,7 @@ public class MockSecurityContext implements WithSecurityContextFactory<MockUser>
 
     @Override
     public SecurityContext createSecurityContext(MockUser annotation) {
-        Member member = new Member.Builder()
+        Member member = Member.builder()
                 .userEmail(annotation.email())
                 .password(annotation.password())
                 .build();

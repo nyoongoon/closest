@@ -1,5 +1,6 @@
 package com.closest.www.domain.member;
 
+import com.closest.www.api.service.auth.request.SignServiceRequest;
 import com.closest.www.domain.subscription.Subscription;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -116,6 +117,10 @@ public class Member implements UserDetails {
         return subscriptions;
     }
 
+    public static Member.Builder builder() {
+        return new Builder();
+    }
+
     public static final class Builder {
         private Long id;
         private String userEmail;
@@ -123,7 +128,7 @@ public class Member implements UserDetails {
         private String nickName;
         private List<MemberAuthority> roles;
 
-        public Builder() {
+        private Builder() {
         }
 
         public Builder userEmail(String userEmail) {
