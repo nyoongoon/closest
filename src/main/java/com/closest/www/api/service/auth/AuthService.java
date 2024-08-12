@@ -1,11 +1,9 @@
 package com.closest.www.api.service.auth;
 
-import com.closest.www.api.controller.auth.request.SignRequest;
-import com.closest.www.api.controller.auth.request.SignRequest.SignUpRequest;
 import com.closest.www.api.controller.auth.request.TokenDto;
 import com.closest.www.api.service.auth.exception.DuplicateIdException;
 import com.closest.www.api.service.auth.exception.MemberNotFoundException;
-import com.closest.www.api.service.auth.request.SignServiceRequest;
+import com.closest.www.api.service.auth.exception.NotEqualPasswordsException;
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignInServiceRequest;
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignUpServiceRequest;
 import com.closest.www.domain.member.Member;
@@ -43,21 +41,24 @@ public class AuthService {
     /**
      * 가입 서비스 로직
      *
-     * @param signUpServiceRequest
+     * @param request
      */
     @Transactional
-    public void signup(SignUpServiceRequest signUpServiceRequest) {
-        //todo 패스워드 확인 패스워드 일치 여부 판단
+    public void signup(SignUpServiceRequest request) {
+        // 비밀번호 일치 판단
+        if (request.password() != null && !request.password().equals(request.confirmPassword())) {
+            throw new NotEqualPasswordsException();
+        }
 
         // 존재여부 판단
-        boolean isExists = memberRepository.existsByUserEmail(signUpServiceRequest.userEmail());
+        boolean isExists = memberRepository.existsByUserEmail(request.userEmail());
         if (isExists) {
             throw new DuplicateIdException();
         }
         // 엔티티 변환
         Member member = Member.create(
-                signUpServiceRequest.userEmail(),
-                signUpServiceRequest.password(),
+                request.userEmail(),
+                request.password(),
                 List.of(ROLE_USER),
                 passwordEncoder
         );

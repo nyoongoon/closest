@@ -1,6 +1,6 @@
 package com.closest.www.api.controller.auth.request;
 
-import com.closest.www.api.controller.auth.exception.NotEqualPasswordsException;
+import com.closest.www.api.service.auth.exception.NotEqualPasswordsException;
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignInServiceRequest;
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignUpServiceRequest;
 import jakarta.validation.constraints.Email;
@@ -28,12 +28,6 @@ public record SignRequest() {
             @Size(min = 8, max = 64, message = NOT_VALID_CONFIRM_PASSWORD_SIZE)
             String confirmPassword
     ) {
-        public SignUpRequest {
-            if (password != null && !password.equals(confirmPassword)) {
-                throw new NotEqualPasswordsException();
-            }
-        }
-
         public SignUpServiceRequest toServiceRequest() {
             return SignUpServiceRequest.builder()
                     .userEmail(userEmail)
@@ -49,8 +43,6 @@ public record SignRequest() {
             String userEmail,
 
             @NotBlank(message = PASSWORD_IS_REQUIRED)
-            @Pattern(regexp = PASSWORD, message = NOT_VALID_PASSWORD_FORM)
-            @Size(min = 8, max = 64, message = NOT_VALID_PASSWORD_SIZE)
             String password
     ) {
         public SignInServiceRequest toServiceRequest() {

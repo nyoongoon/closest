@@ -12,9 +12,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import static com.closest.www.api.controller.auth.exception.AuthControllerExceptionMessageConstants.*;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignInRequest;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignUpRequest;
-import static com.closest.www.api.controller.auth.exception.AuthControllerExceptionMessageConstants.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -87,27 +87,23 @@ class AuthControllerTest extends ControllerTestSupport {
 
     @DisplayName("회원가입 시 확인 비밀번호가 없으면 에러가 발생한다.")
     @Test
-    void signupBlankConfirmPasword() throws Exception {
+    void signupBlankConfirmPassword() throws Exception {
         //given
         SignUpRequest signUpRequest = new SignUpRequest(
                 "abcd@naver.com",
                 "Abcd1234!",
-                ""
+                null
         );
         String json = objectMapper.writeValueAsString(signUpRequest);
         //expected
-        assertThatThrownBy(
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andExpect(jsonPath("$.code").value("400"))
-                        .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                        .andExpect(jsonPath("$.message").value(CONFIRM_PASSWORD_IS_REQUIRED))
-        )
-                .isInstanceOf(MethodArgumentNotValidException.class);
-
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value(CONFIRM_PASSWORD_IS_REQUIRED));
     }
 
     @DisplayName("회원가입 신청 시 이메일 형식이 틀리면 에러가 발생한다.")
@@ -121,41 +117,36 @@ class AuthControllerTest extends ControllerTestSupport {
         );
         String json = objectMapper.writeValueAsString(signUpRequest);
         //expected
-        assertThatThrownBy(
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andExpect(jsonPath("$.code").value("400"))
-                        .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                        .andExpect(jsonPath("$.message").value(NOT_VALID_EMAIL_FORM))
-        )
-                .isInstanceOf(MethodArgumentNotValidException.class);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value(NOT_VALID_EMAIL_FORM));
+
     }
 
-    @DisplayName("회원가입 신청 시 비밀번호가 8자 이상이 아니면 않으면 에러가 발생한다.")
+    @DisplayName("회원가입 신청 시 비밀번호가 8자 이상이 아니면 에러가 발생한다.")
     @Test
     void signupOverPasswordLength() throws Exception {
         //given
         SignUpRequest signUpRequest = new SignUpRequest(
                 "abcd@naver.com",
-                "Abcd124!",
+                "Abcd12!",
                 "Abcd124!"
         );
         String json = objectMapper.writeValueAsString(signUpRequest);
         //expected
-        assertThatThrownBy(
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andExpect(jsonPath("$.code").value("400"))
-                        .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                        .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_SIZE))
-        )
-                .isInstanceOf(MethodArgumentNotValidException.class);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_SIZE));
     }
 
     @DisplayName("회원가입 신청 시 비밀번호에 대문자가 포함되어 있지 않으면 아니면 않으면 에러가 발생한다.")
@@ -164,22 +155,19 @@ class AuthControllerTest extends ControllerTestSupport {
         //given
         SignUpRequest signUpRequest = new SignUpRequest(
                 "abcd@naver.com",
-                "Abcd1234!",
+                "abcd1234!",
                 "Abcd1234!"
         );
         String json = objectMapper.writeValueAsString(signUpRequest);
         //expected
-        assertThatThrownBy(
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andExpect(jsonPath("$.code").value("400"))
-                        .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                        .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_FORM))
-        )
-                .isInstanceOf(MethodArgumentNotValidException.class);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_FORM));
     }
 
     @DisplayName("회원가입 신청 시 소문자가 포함되어 있지 않으면 아니면 않으면 에러가 발생한다.")
@@ -188,22 +176,19 @@ class AuthControllerTest extends ControllerTestSupport {
         //given
         SignUpRequest signUpRequest = new SignUpRequest(
                 "abcd@naver.com",
-                "Abcd1234!",
+                "ABCD1234!",
                 "Abcd1234!"
         );
         String json = objectMapper.writeValueAsString(signUpRequest);
         //expected
-        assertThatThrownBy(
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andExpect(jsonPath("$.code").value("400"))
-                        .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                        .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_FORM))
-        )
-                .isInstanceOf(MethodArgumentNotValidException.class);
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_FORM));
     }
 
     @DisplayName("회원가입 신청 시 특수문자가 포함되어 있지 않으면 아니면 않으면 에러가 발생한다.")
@@ -212,46 +197,20 @@ class AuthControllerTest extends ControllerTestSupport {
         //given
         SignUpRequest signUpRequest = new SignUpRequest(
                 "abcd@naver.com",
-                "Abcd1234!",
+                "Abcd1234",
                 "Abcd1234!"
         );
         String json = objectMapper.writeValueAsString(signUpRequest);
         //expected
-        assertThatThrownBy(
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andExpect(jsonPath("$.code").value("400"))
-                        .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                        .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_FORM))
-        )
-                .isInstanceOf(MethodArgumentNotValidException.class);
-    }
+        mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value(NOT_VALID_PASSWORD_FORM));
 
-
-    @DisplayName("회원가입 신청 시 비밀번호와 확인 비밀번호가 다르면 않으면 에러가 발생한다.")
-    @Test
-    void signupNotEqualPasswords() throws Exception {
-        //given
-        SignUpRequest signUpRequest = new SignUpRequest(
-                "abcd@naver.com",
-                "Abcd124!!",
-                "Abcd124!!!"
-        );
-        String json = objectMapper.writeValueAsString(signUpRequest);
-        //expected
-        assertThatThrownBy(
-                () -> mockMvc.perform(MockMvcRequestBuilders.post("/auth/signup")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json))
-                        .andDo(MockMvcResultHandlers.print())
-                        .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                        .andExpect(jsonPath("$.code").value("400"))
-                        .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-        )
-                .isInstanceOf(BlogNotFoundException.class);
     }
 
     @DisplayName("이메일과 비밀번호로 로그인을 진행한다.")
@@ -260,7 +219,7 @@ class AuthControllerTest extends ControllerTestSupport {
         // given
         SignInRequest signInRequest = new SignInRequest(
                 "abcd@naver.com",
-                "12g4agg"
+                "12g4agg!"
         );
 
         String json = objectMapper.writeValueAsString(signInRequest);
@@ -269,8 +228,10 @@ class AuthControllerTest extends ControllerTestSupport {
         mockMvc.perform(MockMvcRequestBuilders.post("/auth/signin")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andDo(MockMvcResultHandlers.print());
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"));
     }
 
 

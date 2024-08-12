@@ -1,4 +1,7 @@
 package com.closest.www.support;
 
-public class IntegrationTestSupport {
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+public abstract class IntegrationTestSupport {
 }
