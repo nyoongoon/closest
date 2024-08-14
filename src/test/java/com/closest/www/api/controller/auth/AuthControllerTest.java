@@ -21,8 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerTest extends ControllerTestSupport {
 
 
-    //todo valid 테스트 추가하기
-
     @DisplayName("이메일과 비밀번호, 확인 비밀번호로 회원가입을 신청 한다.")
     @Test
     void signup() throws Exception {
