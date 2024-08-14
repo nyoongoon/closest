@@ -17,6 +17,7 @@ spring:
       ddl-auto: create
     show-sql: true
   #    defer-datasource-initialization: true # 하이버네이트 초기화 전 쿼리 실행
+  ## batch size설정 넣기
 
 #logging:
 #  level:

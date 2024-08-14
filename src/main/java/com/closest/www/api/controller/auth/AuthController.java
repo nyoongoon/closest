@@ -41,7 +41,7 @@ public class AuthController {
      */
     @PostMapping("/signin")
     public ApiResponse<Void> signin(@Valid @RequestBody SignInRequest signInRequest,
-                                    HttpServletResponse response) {
+                                    HttpServletResponse response) { //todo service에 httpServletReseponse 제거
         authService.signin(signInRequest.toServiceRequest(), response);
         return ApiResponse.ok();
     }
