@@ -6,6 +6,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpInputMessage;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -78,6 +79,13 @@ public class HttpMessageConverterConfig  {
     @Bean
     public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
         objectMapper.getFactory().setCharacterEscapes(new HtmlCharacterEscapes());
-        return new MappingJackson2HttpMessageConverter(objectMapper);
+
+        return new MappingJackson2HttpMessageConverter(objectMapper) {
+            @Override
+            public boolean canWrite(Class<?> clazz, MediaType mediaType) {
+                // 응답인 경우에 요청 태우지 않는다.
+                return false;
+            }
+        };
     }
 }

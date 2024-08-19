@@ -15,6 +15,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+      default_batch_fetch_size: 100
     show-sql: true
   #    defer-datasource-initialization: true # 하이버네이트 초기화 전 쿼리 실행
 

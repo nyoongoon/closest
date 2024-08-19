@@ -35,7 +35,7 @@ public class XssTest {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "file content".getBytes());
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart")
                         .file(file)
-                        .param("field", "<script>alert(1)</script>"))
+                        .param("field&", "<script>alert(1)</script>"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
     }
