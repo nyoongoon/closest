@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
 
@@ -28,14 +29,32 @@ public class XssTest {
     @Autowired
     private MockMvc mockMvc;
 
-
-    // multipart/form-data 테스트
+    // multipart/form-data 테스트 - 문자열
     @Test
     public void testMultipartFormData() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "file content".getBytes());
+        MockMultipartFile content = new MockMultipartFile("content", "", "text/plain", "<script>alert(1)</script>".getBytes());
+
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart")
                         .file(file)
-                        .param("field&", "<script>alert(1)</script>"))
+                        .file(content)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
+    }
+
+    // multipart/form-data 테스트 - DTO
+    @Test
+    public void testMultipartFormDataObj() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "test.png", "multipart/form-data", "file content".getBytes());
+        XssRequestDto dto = new XssRequestDto("<script>alert(1)</script>");
+        String json = objectMapper.writeValueAsString(dto);
+        MockMultipartFile content = new MockMultipartFile("content", null, "application/json", json.getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart/object")
+                        .file(file)
+                        .file(content)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
     }
@@ -47,7 +66,7 @@ public class XssTest {
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content("field=<script>alert(1)</script>"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
+                .andExpect(jsonPath("$.escapedFormData").value("{field=[&lt;script&gt;alert(1)&lt;/script&gt;]}"));
     }
 
     // text/plain 테스트
@@ -118,7 +137,7 @@ public class XssTest {
         // given
         String input = "<li>content</li>";
         String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
-        LocalDate requestDate = LocalDate.of(2019,12,29);
+        LocalDate requestDate = LocalDate.of(2019, 12, 29);
         XssRequestLocalDateDto xssRequestLocalDateDto = new XssRequestLocalDateDto(input, requestDate);
         String json = objectMapper.writeValueAsString(xssRequestLocalDateDto);
 
@@ -149,7 +168,8 @@ public class XssTest {
     @Test
     void jsonXssProtectionTest() throws Exception {
         String input = "<li>content</li>";
-        String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";;
+        String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
+        ;
 
         XssRequestDto xssRequestDto = new XssRequestDto(input);
         String json = objectMapper.writeValueAsString(xssRequestDto);
@@ -192,6 +212,7 @@ public class XssTest {
 
     /**
      * 해당 컨트롤러는 선언하면 안됨 (파일과 dto 분리)
+     *
      * @throws Exception
      */
 //    @Test
@@ -207,7 +228,6 @@ public class XssTest {
 //                .andExpect(status().isOk())
 //                .andExpect(content().string(Arrays.toString(expectedOutput.getBytes())));
 //    }
-
     @Test
     void plainTextXssProtectionTest() throws Exception {
         String input = "<li>content</li>";
@@ -245,6 +265,7 @@ public class XssTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isUnsupportedMediaType());
     }
+
     @Test
     void complexJsonXssTest() throws Exception {
         String input = "<li>content</li>";

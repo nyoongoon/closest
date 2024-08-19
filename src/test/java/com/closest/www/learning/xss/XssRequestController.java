@@ -2,6 +2,7 @@ package com.closest.www.learning.xss;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,24 +13,35 @@ import java.util.Map;
 @RestController
 public class XssRequestController {
 
-    // multipart/form-data 예시
+    // multipart/form-data 예시 - 문자열
     @PostMapping(value = "/api/multipart")
     public ResponseEntity<Map<String, String>> handleMultipartFormData(
-            @RequestParam Map<String, String> formData,
-            @RequestParam("file") MultipartFile file) {
-        // formData는 자동으로 XSS 이스케이프 처리가 됩니다.
-        Map<String, String> response = new HashMap<>();
-        response.put("escapedFormData", formData.toString());
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("content") String content) {
 
-        // 파일 처리 로직 (file은 이스케이프 처리가 필요 없음)
+        Map<String, String> response = new HashMap<>();
+        response.put("escapedFormData", "{field=" + content + "}");
+
+        return ResponseEntity.ok(response);
+    }
+    // multipart/form-data 예시 - 객체
+    @PostMapping(value = "/api/multipart/object")
+    public ResponseEntity<Map<String, String>> handleMultipartFormDataObj(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("content") XssRequestDto xssRequestDto) {
+
+        Map<String, String> response = new HashMap<>();
+        response.put("escapedFormData", "{field=" + xssRequestDto.getContent() + "}");
 
         return ResponseEntity.ok(response);
     }
 
+
+
     // application/x-www-form-urlencoded 예시
     @PostMapping(value = "/api/form-urlencoded")
     public ResponseEntity<Map<String, String>> handleFormUrlEncoded(
-            @RequestParam Map<String, String> formData) {
+            @RequestBody MultiValueMap<String, String> formData) {
         // formData는 자동으로 XSS 이스케이프 처리가 됩니다.
         Map<String, String> response = new HashMap<>();
         response.put("escapedFormData", formData.toString());
