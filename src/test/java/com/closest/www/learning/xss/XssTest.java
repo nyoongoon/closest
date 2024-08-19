@@ -47,7 +47,7 @@ public class XssTest {
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .content("field=<script>alert(1)</script>"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.escapedFormData").value("{field=&#60;script&#62;alert(1)&#60;/script&#62;}"));
+                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
     }
 
     // text/plain 테스트

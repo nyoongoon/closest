@@ -27,7 +27,7 @@ public class XssRequestController {
     }
 
     // application/x-www-form-urlencoded 예시
-    @PostMapping(value = "/form-urlencoded")
+    @PostMapping(value = "/api/form-urlencoded")
     public ResponseEntity<Map<String, String>> handleFormUrlEncoded(
             @RequestParam Map<String, String> formData) {
         // formData는 자동으로 XSS 이스케이프 처리가 됩니다.
