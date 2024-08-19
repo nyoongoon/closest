@@ -6,14 +6,47 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 public class XssRequestController {
+
+    // multipart/form-data 예시
+    @PostMapping(value = "/api/multipart")
+    public ResponseEntity<Map<String, String>> handleMultipartFormData(
+            @RequestParam Map<String, String> formData,
+            @RequestParam("file") MultipartFile file) {
+        // formData는 자동으로 XSS 이스케이프 처리가 됩니다.
+        Map<String, String> response = new HashMap<>();
+        response.put("escapedFormData", formData.toString());
+
+        // 파일 처리 로직 (file은 이스케이프 처리가 필요 없음)
+
+        return ResponseEntity.ok(response);
+    }
+
+    // application/x-www-form-urlencoded 예시
+    @PostMapping(value = "/form-urlencoded")
+    public ResponseEntity<Map<String, String>> handleFormUrlEncoded(
+            @RequestParam Map<String, String> formData) {
+        // formData는 자동으로 XSS 이스케이프 처리가 됩니다.
+        Map<String, String> response = new HashMap<>();
+        response.put("escapedFormData", formData.toString());
+        return ResponseEntity.ok(response);
+    }
+
+
 
     @PostMapping("/xss")
     public XssRequestDto postXss(@RequestBody XssRequestDto xssRequestDto) {
         return xssRequestDto;
     }
+
+//    @PostMapping("/xss/form")
+//    public String form(String content) {
+//        return content;  // 실제 이스케이핑 처리는 컨버터에서 이루어짐
+//    }
 
     @PostMapping("/xss/form")
     public String form(XssRequestDto xssRequestDto) {
@@ -52,9 +85,6 @@ public class XssRequestController {
 
     @PostMapping("/plain")
     public ResponseEntity<String> plainTextXssProtection(@RequestBody String content) {
-        // HTML escape the content
-//        String escapedContent = StringEscapeUtils.escapeHtml4(content);
-//        return ResponseEntity.ok(escapedContent);
         return ResponseEntity.ok(content);
     }
 }

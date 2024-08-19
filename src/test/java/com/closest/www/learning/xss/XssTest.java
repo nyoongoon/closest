@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
@@ -27,6 +28,49 @@ public class XssTest {
     @Autowired
     private MockMvc mockMvc;
 
+
+    // multipart/form-data 테스트
+    @Test
+    public void testMultipartFormData() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "file content".getBytes());
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart")
+                        .file(file)
+                        .param("field", "<script>alert(1)</script>"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
+    }
+
+    // application/x-www-form-urlencoded 테스트
+    @Test
+    public void testFormUrlEncoded() throws Exception {
+        mockMvc.perform(post("/api/form-urlencoded")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .content("field=<script>alert(1)</script>"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.escapedFormData").value("{field=&#60;script&#62;alert(1)&#60;/script&#62;}"));
+    }
+
+    // text/plain 테스트
+    @Test
+    public void testPlainText() throws Exception {
+        mockMvc.perform(post("/api/text")
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content("<script>alert(1)</script>"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Escaped text: &#60;script&#62;alert(1)&#60;/script&#62;"));
+    }
+
+    // application/json 테스트
+    @Test
+    public void testJson() throws Exception {
+        String json = "{\"field\":\"<script>alert(1)</script>\"}";
+        mockMvc.perform(post("/api/json")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.escapedJsonData.field").value("&#60;script&#62;alert(1)&#60;/script&#62;"));
+    }
+
     @Test
     void postXss() throws Exception {
         //given
@@ -37,7 +81,7 @@ public class XssTest {
 
         String json = objectMapper.writeValueAsString(xssRequestDto);
         //expected
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss")
+        mockMvc.perform(post("/xss")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andDo(MockMvcResultHandlers.print())
@@ -49,12 +93,13 @@ public class XssTest {
     void formXss() throws Exception {
         // given
         String input = "<li>content</li>";
+        XssRequestDto content = new XssRequestDto(input);
         String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
 
         // expected
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss/form")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .param("content", input))
+        mockMvc.perform(post("/xss/form")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                        .content(objectMapper.writeValueAsString(content)))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
@@ -78,7 +123,7 @@ public class XssTest {
         String json = objectMapper.writeValueAsString(xssRequestLocalDateDto);
 
         // expected
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss/local-date")
+        mockMvc.perform(post("/xss/local-date")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andDo(MockMvcResultHandlers.print())
@@ -109,7 +154,7 @@ public class XssTest {
         XssRequestDto xssRequestDto = new XssRequestDto(input);
         String json = objectMapper.writeValueAsString(xssRequestDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/json")
+        mockMvc.perform(post("/json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andDo(MockMvcResultHandlers.print())
@@ -122,7 +167,7 @@ public class XssTest {
         String input = "<li>content</li>";
         String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss/form")
+        mockMvc.perform(post("/xss/form")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("content", input))
                 .andDo(MockMvcResultHandlers.print())
@@ -168,7 +213,7 @@ public class XssTest {
         String input = "<li>content</li>";
         String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/plain")
+        mockMvc.perform(post("/plain")
                         .contentType(MediaType.TEXT_PLAIN)
                         .content(input))
                 .andDo(MockMvcResultHandlers.print())
@@ -183,7 +228,7 @@ public class XssTest {
 
         String xmlContent = "<xssRequestDto><content>" + input + "</content></xssRequestDto>";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xml")
+        mockMvc.perform(post("/xml")
                         .contentType(MediaType.APPLICATION_XML)
                         .content(xmlContent))
                 .andDo(MockMvcResultHandlers.print())
@@ -195,7 +240,7 @@ public class XssTest {
     void noContentTypeTest() throws Exception {
         String input = "<li>content</li>";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss")
+        mockMvc.perform(post("/xss")
                         .content(input)) // Content-Type 없이 전송
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isUnsupportedMediaType());
@@ -208,7 +253,7 @@ public class XssTest {
         ComplexDto complexDto = new ComplexDto(new XssRequestDto(input), Arrays.asList(new XssRequestDto(input)));
         String json = objectMapper.writeValueAsString(complexDto);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss/complex")
+        mockMvc.perform(post("/xss/complex")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andDo(MockMvcResultHandlers.print())
@@ -223,7 +268,7 @@ public class XssTest {
         String input = "";
         String expectedOutput = "";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss")
+        mockMvc.perform(post("/xss")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"\"}"))
                 .andDo(MockMvcResultHandlers.print())
@@ -234,7 +279,7 @@ public class XssTest {
     // 2. null 값 테스트
     @Test
     void nullValueTest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss")
+        mockMvc.perform(post("/xss")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":null}"))
                 .andDo(MockMvcResultHandlers.print())
@@ -249,7 +294,7 @@ public class XssTest {
         //        String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
         String invalidJson = "{content: <li>content</li>}"; // 잘못된 JSON 형식
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss")
+        mockMvc.perform(post("/xss")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andDo(MockMvcResultHandlers.print())
@@ -263,7 +308,7 @@ public class XssTest {
 //        String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
         String invalidXml = "<xssRequestDto><content><li>content</li></content>"; // 잘못된 XML 형식
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xml")
+        mockMvc.perform(post("/xml")
                         .contentType(MediaType.APPLICATION_XML)
                         .content(invalidXml))
                 .andDo(MockMvcResultHandlers.print())
@@ -276,7 +321,7 @@ public class XssTest {
         String input = "<s<script>cript>alert(XSS)</s<script>cript>";
         String expectedOutput = "&lt;s&lt;script&gt;cript&gt;alert(XSS)&lt;/s&lt;script&gt;cript&gt;";
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/xss")
+        mockMvc.perform(post("/xss")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"" + input + "\"}"))
                 .andDo(MockMvcResultHandlers.print())
