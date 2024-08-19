@@ -57,7 +57,7 @@ public class XssTest {
                         .contentType(MediaType.TEXT_PLAIN)
                         .content("<script>alert(1)</script>"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Escaped text: &#60;script&#62;alert(1)&#60;/script&#62;"));
+                .andExpect(content().string("Escaped text: &lt;script&gt;alert(1)&lt;/script&gt;"));
     }
 
     // application/json 테스트

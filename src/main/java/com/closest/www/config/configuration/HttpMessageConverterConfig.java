@@ -1,24 +1,18 @@
 package com.closest.www.config.configuration;
 
 import com.closest.www.config.configuration.xss.HtmlCharacterEscapes;
-import com.fasterxml.jackson.core.io.CharacterEscapes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -34,12 +28,7 @@ public class HttpMessageConverterConfig  {
     }
 
     /**
-     * multipart/form-data
-     */
-
-
-    /**
-     * application/x-www-form-urlencoded
+     * application/x-www-form-urlencoded & multipart/form-data
      * @return
      */
     @Bean

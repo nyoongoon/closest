@@ -37,6 +37,22 @@ public class XssRequestController {
     }
 
 
+    // text/plain 예시
+    @PostMapping(value = "/api/text")
+    public ResponseEntity<String> handlePlainText(@RequestBody String text) {
+        // text는 자동으로 XSS 이스케이프 처리가 됩니다.
+        return ResponseEntity.ok("Escaped text: " + text);
+    }
+
+    // application/json 예시
+    @PostMapping(value = "/api/json")
+    public ResponseEntity<Map<String, Object>> handleJson(@RequestBody Map<String, Object> jsonData) {
+        // jsonData는 자동으로 XSS 이스케이프 처리가 됩니다.
+        Map<String, Object> response = new HashMap<>();
+        response.put("escapedJsonData", jsonData);
+        return ResponseEntity.ok(response);
+    }
+
 
     @PostMapping("/xss")
     public XssRequestDto postXss(@RequestBody XssRequestDto xssRequestDto) {
