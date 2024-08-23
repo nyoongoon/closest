@@ -1,72 +1,41 @@
 package com.closest.www.config.configuration.xss;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.text.translate.AggregateTranslator;
 import org.apache.commons.text.translate.CharSequenceTranslator;
 import org.apache.commons.text.translate.LookupTranslator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpInputMessage;
-import org.springframework.http.MediaType;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
-import static org.apache.commons.text.StringEscapeUtils.ESCAPE_HTML4;
-
+/**
+ * 기존 lucy-filter와 CharacterEscapes를 사용한 HttpMessageConverter 방식은 입력값이 아닌 출력값에 대한 문자열 이스케이프 적용 중이었음
+ */
 @Configuration
-
 public class XssConfiguration {
-    private final ObjectMapper objectMapper;
-
-    public XssConfiguration(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     @Bean
     public CharSequenceTranslator charSequenceTranslator() {
-        CharSequenceTranslator translator = ESCAPE_HTML4;
-        LookupTranslator lookupTranslator = new LookupTranslator(
-                // 커스텀 이스케이프 설정
-                Map.of(
-                        "'", "&apos;"
+        // 커스텀 이스케이프 설정
+        Map<CharSequence, CharSequence> escapes = new HashMap<>() {{
+            put("<", "&lt;");
+            put(">", "&gt;");
+            put("(", "&#40;");
+            put(")", "&#41;");
+            put("#", "&#35;");
+            put("'", "&apos;");
+            put("&", "&amp;");
+            put(Character.toString(8226), "·");
+            put(Character.toString(8729), "·");
+            put(Character.toString(8901), "·");
+            put(Character.toString(9702), "·");
+        }};
+
+        return new AggregateTranslator(
+                new LookupTranslator(
+                        escapes
                 )
         );
-        return translator.with(lookupTranslator);
-    }
-
-    /**
-     * http body 값이 text/plain인 경우
-     * - multipart/form-data
-     * @return
-     */
-    @Bean
-    public StringHttpMessageConverter textEscapeConverter() {
-        return new StringHttpMessageConverter() {
-            @Override
-            protected String readInternal(Class<? extends String> clazz, HttpInputMessage inputMessage)
-                    throws IOException {
-                String body = super.readInternal(clazz, inputMessage);
-                return StringEscapeUtils.escapeHtml4(body);
-            }
-        };
-    }
-
-    /**
-     * @ResponseBody가 사용되는
-     * application/json 혹은
-     * @return
-     */
-    @Bean
-    public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
-        objectMapper.getFactory().setCharacterEscapes(new XssCharacterEscapes(charSequenceTranslator()));
-        return new MappingJackson2HttpMessageConverter(objectMapper){
-            @Override
-            public boolean canWrite(Class<?> clazz, MediaType mediaType) {
-                return false; //응답시 작동하지 않음
-            }
-        };
     }
 }

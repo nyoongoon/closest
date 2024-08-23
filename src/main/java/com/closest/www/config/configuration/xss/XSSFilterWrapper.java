@@ -1,28 +1,30 @@
 package com.closest.www.config.configuration.xss;
 
-import jakarta.servlet.ReadListener;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import jakarta.servlet.http.Part;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.translate.CharSequenceTranslator;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.http.HttpMethod;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+/**
+ * XSS 필터 래퍼
+ * - inputStream을 사용하기 위해 HttpServletRequestWrapper를 상속받음 (inputStream은 톰캣에 의하여 한 번만 읽을 수 있다)
+ * <p>
+ * - text/plain 필터링
+ * - application/x-www-urlencoded 필터링
+ * - application/json 필터링 -> json은 따로 messageConverter로 (\")변환이슈
+ * - multipart/form-data 필터링
+ */
 
 public class XSSFilterWrapper extends HttpServletRequestWrapper {
     // 이스케이프를 위한 Translator
     private final CharSequenceTranslator translator;
-    private byte[] rawData;
+
     /**
      * Constructs a request object wrapping the given request.
      *
@@ -32,16 +34,6 @@ public class XSSFilterWrapper extends HttpServletRequestWrapper {
     public XSSFilterWrapper(HttpServletRequest request, CharSequenceTranslator translator) {
         super(request);
         this.translator = translator;
-
-        try {
-            String contentType = request.getContentType();
-            if(StringUtils.isNotBlank(contentType)  && contentType.equals(TEXT_PLAIN_VALUE)) {
-                InputStream is = request.getInputStream();
-                this.rawData = replaceXSS(inputStreamToByteArray(is));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private byte[] replaceXSS(byte[] data) {
@@ -56,41 +48,6 @@ public class XSSFilterWrapper extends HttpServletRequestWrapper {
         return value;
     }
 
-    //새로운 인풋스트림을 리턴하지 않으면 에러가 남
-    @Override
-    public ServletInputStream getInputStream() throws IOException {
-        if(this.rawData == null) {
-            return super.getInputStream();
-        }
-        final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(this.rawData);
-
-        return new ServletInputStream() {
-
-            @Override
-            public int read() throws IOException {
-                // TODO Auto-generated method stub
-                return byteArrayInputStream.read();
-            }
-
-            @Override
-            public void setReadListener(ReadListener readListener) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public boolean isReady() {
-                // TODO Auto-generated method stub
-                return false;
-            }
-
-            @Override
-            public boolean isFinished() {
-                // TODO Auto-generated method stub
-                return false;
-            }
-        };
-    }
-
     @Override
     public String getQueryString() {
         return replaceXSS(super.getQueryString());
@@ -102,35 +59,18 @@ public class XSSFilterWrapper extends HttpServletRequestWrapper {
         return replaceXSS(super.getParameter(name));
     }
 
-    @Override
-    public Collection<Part> getParts() throws IOException, ServletException {
-        Collection<Part> parts = super.getParts();
-        Map<String, String> escapedParameters = new HashMap<>();
-
-        for (Part part : parts) {
-            System.out.println(part.getContentType());
-            // 파일인 경우는 그대로 넘기고, 그 외의 파라미터에 대해 XSS 필터링
-            if (part.getSubmittedFileName() == null) {
-                String partName = part.getName();
-                String partValue = new String(part.getInputStream().readAllBytes());
-                String escapedValue = replaceXSS(partValue);
-                escapedParameters.put(partName, escapedValue);
-            }
-        }
-
-        // 모든 파라미터들에 대해 escape 처리된 파라미터들로 대체
-        for (Map.Entry<String, String> entry : escapedParameters.entrySet()) {
-//            PartWrapper escapedPart = new PartWrapper(entry.getKey(), entry.getValue());
-//            parts.removeIf(p -> p.getName().equals(entry.getKey()));
-//            parts.add(escapedPart);
-        }
-
-        return parts;
-    }
-
+    /**
+     * GET인 경우만 사용 (요청이 Http Body 값인 경우 사용안하기 위함)
+     * - GET이 아니여도 application/x-www-form-urlencoded 등의 경우 해당 메서드가 사용되는데
+     * - -> 이스케이프 처리 시 HttpMessageConverter 까지 타게 되므로 이스케이핑이 두번 되는 이슈가 있다.
+     * @return
+     */
     @Override
     public Map<String, String[]> getParameterMap() {
         Map<String, String[]> params = super.getParameterMap();
+        if (!getMethod().equalsIgnoreCase(HttpMethod.GET.name())) {
+            return params;
+        }
         if (params != null) {
             params.forEach((key, value) -> {
                 for (int i = 0; i < value.length; i++) {
@@ -140,7 +80,6 @@ public class XSSFilterWrapper extends HttpServletRequestWrapper {
         }
         return params;
     }
-
 
     @Override
     public String[] getParameterValues(String name) {
@@ -153,22 +92,8 @@ public class XSSFilterWrapper extends HttpServletRequestWrapper {
         return params;
     }
 
-
     @Override
     public BufferedReader getReader() throws IOException {
         return new BufferedReader(new InputStreamReader(this.getInputStream(), StandardCharsets.UTF_8));
     }
-
-    private byte[] inputStreamToByteArray(InputStream is) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int nRead;
-        byte[] data = new byte[1024];  // 1KB씩 읽어들이기 위한 버퍼 크기
-
-        while ((nRead = is.read(data, 0, data.length)) != -1) {
-            buffer.write(data, 0, nRead);
-        }
-
-        return buffer.toByteArray();
-    }
 }
-

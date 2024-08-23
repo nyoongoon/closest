@@ -22,69 +22,100 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-class XssFilterLearningTest {
+class XssFilterTest {
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
     private MockMvc mockMvc;
 
-    @DisplayName("multipart/form-data 문자열 이스케이프 테스트 - @RequestPart 문자열")
+    @DisplayName("multipart/form-data 문자열 이스케이프 테스트 - @RequestParam 문자열")
     @Test
     public void testMultipartFormData() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "file content".getBytes());
-        MockMultipartFile content = new MockMultipartFile("content", "", "text/plain", "<script>alert(1)</script>".getBytes());
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart")
+                        .file(file)
+                        .param("content", "<script>alert(1)</script>")
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;}"));
+    }
+
+    @DisplayName("multipart/form-data 문자열 이스케이프 테스트 - @RequestParam DTO")
+    @Test
+    public void testMultipartFormDataObj() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "test.png", "multipart/form-data", "file content".getBytes());
+//        XssRequestDto dto = new XssRequestDto("<script>alert(1)</script>");
+        String json = "{\"content\":\"<script>alert(1)</script>\"}";
+//        MockMultipartFile content = new MockMultipartFile("content", null, "application/json", json.getBytes(StandardCharsets.UTF_8));
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart/object")
+                        .file(file)
+                        .param("content", json)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.escapedFormData").value("{field={\"content\":\"&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;\"}}"));
+    }
+
+    @DisplayName("multipart/form-data 문자열 이스케이프 테스트 - @RequestPart 문자열")
+    @Test
+    public void testMultipartFormDataByRequestPart() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "test.txt", "text/plain", "file content".getBytes());
+
+        MockMultipartFile content = new MockMultipartFile("content", null, "text/plain", "<script>alert(1)</script>".getBytes());
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart/part")
                         .file(file)
                         .file(content)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
+                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;}"));
     }
 
     @DisplayName("multipart/form-data 문자열 이스케이프 테스트 - @RequestPart DTO")
     @Test
-    public void testMultipartFormDataObj() throws Exception {
+    public void testMultipartFormDataObjByRequestPart() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "test.png", "multipart/form-data", "file content".getBytes());
         XssRequestDto dto = new XssRequestDto("<script>alert(1)</script>");
         String json = objectMapper.writeValueAsString(dto);
         MockMultipartFile content = new MockMultipartFile("content", null, "application/json", json.getBytes(StandardCharsets.UTF_8));
 
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart/object")
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/multipart/object/part")
                         .file(file)
                         .file(content)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(csrf()))
-                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert(1)&lt;/script&gt;}"));
+                .andExpect(jsonPath("$.escapedFormData").value("{field=&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;}"));
     }
 
-    @DisplayName("application/x-www-form-urlencoded 문자열 이스케이프 테스트 - @RequestBody로 요청해야 컨버터 작동")
+    @DisplayName("application/x-www-form-urlencoded 문자열 이스케이프 테스트 - @RequestBody MultiValuMap")
     @Test
-    public void testFormUrlEncoded() throws Exception {
-        mockMvc.perform(post("/api/form-urlencoded")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .content("field=<script>alert(1)</script>")
+    public void testHandleFormUrlEncoded() throws Exception {
+        this.mockMvc.perform(post("/api/form-urlencoded")
+                        .content("field=<script>alert(1)</script>&content=<script>alert(1)</script>")
+                        .contentType("application/x-www-form-urlencoded")
                         .with(csrf()))
-                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("&lt;script&gt;alert(1)&lt;/script&gt;"));
+                .andExpect(jsonPath("$.content").value("&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;"));
     }
 
-    @DisplayName("application/x-www-form-urlencoded 문자열 이스케이프 테스트 - @RequestParam ")
+    @DisplayName("application/x-www-form-urlencoded 문자열 이스케이프 테스트 - @RequestParam")
     @Test
-    public void testFormUrlEncodedByRequestParam() throws Exception  // param은 필터로 받는지 확인하기
-        mockMvc.perform(post("/api/form-urlencoded/param")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+    public void testHandleFormUrlEncodedByParam() throws Exception {
+        this.mockMvc.perform(post("/api/form-urlencoded/param")
+                        .param("field", "<script>alert(1)</script>")
                         .param("content", "<script>alert(1)</script>")
+                        .contentType("application/x-www-form-urlencoded")
                         .with(csrf()))
-                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("&lt;script&gt;alert(1)&lt;/script&gt;"));
+                .andExpect(jsonPath("$.content").value("&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;"));
     }
+
 
     @DisplayName("text/plain 문자열 이스케이프 테스트")
     @Test
@@ -94,7 +125,7 @@ class XssFilterLearningTest {
                         .content("<script>alert(1)</script>")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Escaped text: &lt;script&gt;alert(1)&lt;/script&gt;"));
+                .andExpect(content().string("Escaped text: &lt;script&gt;alert&#40;1&#41;&lt;/script&gt;"));
     }
 
     @DisplayName("application/json 문자열 이스케이프 테스트")
@@ -107,8 +138,9 @@ class XssFilterLearningTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
                         .with(csrf()))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value("&lt;script&gt;alert(1)&lt;/script&gt;"));
+                .andExpect(jsonPath("$.content").value("&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;"));
     }
 
     /**
@@ -119,8 +151,8 @@ class XssFilterLearningTest {
     @Test
     void formXss() throws Exception {
         // given
-        String input = "<li>content</li>";
-        String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
+        String input = "<script>alert(1)</script>";
+        String expectedOutput = "&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;";
 
         // expected
         mockMvc.perform(post("/xss/form")
@@ -143,8 +175,7 @@ class XssFilterLearningTest {
     @Test
     void localDateXss() throws Exception {
         // given
-        String input = "<li>content</li>";
-        String expectedOutput = "&lt;li&gt;content&lt;/li&gt;";
+        String input = "<script>alert(1)</script>";
         LocalDate requestDate = LocalDate.of(2019, 12, 29);
         XssRequestLocalDateDto xssRequestLocalDateDto = new XssRequestLocalDateDto(input, requestDate);
         String json = objectMapper.writeValueAsString(xssRequestLocalDateDto);
@@ -156,6 +187,6 @@ class XssFilterLearningTest {
                         .with(csrf()))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").value(expectedOutput));
+                .andExpect(jsonPath("$.content").value("&lt;script&gt;alert&#40;1&#41;&lt;/script&gt;"));
     }
 }

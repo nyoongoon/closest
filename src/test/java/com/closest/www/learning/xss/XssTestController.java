@@ -13,15 +13,11 @@ import java.util.Map;
 @RestController
 public class XssTestController {
 
-    /**
-     * multipart/form-data는 body 요청이므로 httpmessageconverter로 처리
-     * @return
-     */
     // multipart/form-data 예시 - 문자열
     @PostMapping(value = "/api/multipart")
     public ResponseEntity<Map<String, String>> handleMultipartFormData(
-            @RequestPart("file") MultipartFile file,
-            @RequestPart("content") String content) {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("content") String content) {
 
         Map<String, String> response = new HashMap<>();
         response.put("escapedFormData", "{field=" + content + "}");
@@ -32,6 +28,30 @@ public class XssTestController {
     // multipart/form-data 예시 - 객체
     @PostMapping(value = "/api/multipart/object")
     public ResponseEntity<Map<String, String>> handleMultipartFormDataObj(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("content") XssRequestDto xssRequestDto) {
+
+        Map<String, String> response = new HashMap<>();
+        response.put("escapedFormData", "{field=" + xssRequestDto.getContent() + "}");
+
+        return ResponseEntity.ok(response);
+    }
+
+    // multipart/form-data 예시 - 문자열 & @RequestPart
+    @PostMapping(value = "/api/multipart/part")
+    public ResponseEntity<Map<String, String>> handleMultipartFormDataByRequestPart(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("content") String content) {
+
+        Map<String, String> response = new HashMap<>();
+        response.put("escapedFormData", "{field=" + content + "}");
+
+        return ResponseEntity.ok(response);
+    }
+
+    // multipart/form-data 예시 - 객체& @RequestPart
+    @PostMapping(value = "/api/multipart/object/part")
+    public ResponseEntity<Map<String, String>> handleMultipartFormDataObjByRequestPart(
             @RequestPart("file") MultipartFile file,
             @RequestPart("content") XssRequestDto xssRequestDto) {
 
@@ -41,27 +61,24 @@ public class XssTestController {
         return ResponseEntity.ok(response);
     }
 
-
     // application/x-www-form-urlencoded 예시
     @PostMapping(value = "/api/form-urlencoded")
-    public ResponseEntity<XssRequestDto> handleFormUrlEncoded(
-            @RequestBody MultiValueMap<String, String> formData) {
+    public ResponseEntity<XssRequestDto> handleFormUrlEncoded(@RequestBody MultiValueMap<String, String> formData) {
         // formData는 자동으로 XSS 이스케이프 처리가 됩니다.
         return ResponseEntity.ok(new XssRequestDto(formData.get("field").getFirst()));
     }
 
+    // application/x-www-form-urlencoded 예시
     @PostMapping(value = "/api/form-urlencoded/param")
-    public ResponseEntity<XssRequestDto> handleFormUrlEncodedByParam(
-            @RequestParam String content) {
+    public ResponseEntity<XssRequestDto> handleFormUrlEncoded(@RequestParam("field") String field) {
         // formData는 자동으로 XSS 이스케이프 처리가 됩니다.
-        return ResponseEntity.ok(new XssRequestDto(content));
+        return ResponseEntity.ok(new XssRequestDto(field));
     }
-
 
     // text/plain 예시
     @PostMapping(value = "/api/text")
     public ResponseEntity<String> handlePlainText(@RequestBody String text) {
-        // text는 자동으로 XSS 이스케이프 처리가 됩니다.
+
         return ResponseEntity.ok("Escaped text: " + text);
     }
 
@@ -71,7 +88,6 @@ public class XssTestController {
         // jsonData는 자동으로 XSS 이스케이프 처리가 됩니다.
         return ResponseEntity.ok(dto);
     }
-
 
     /**
      * 예외 예시 컨트롤러
@@ -85,11 +101,11 @@ public class XssTestController {
         return xssRequestDto.getContent();
     }
 
-//    @PostMapping("/multipart")
-//    public byte[] handleMultipartFile(@RequestParam("file") MultipartFile file) throws IOException {
-//        // 현재는 파일 내용을 그대로 반환
-//        return file.getBytes();
-//    }
+    @PostMapping("/multipart")
+    public byte[] handleMultipartFile(@RequestParam("file") MultipartFile file) throws IOException {
+        // 현재는 파일 내용을 그대로 반환
+        return file.getBytes();
+    }
 
     @PostMapping("/upload")
     public String handleUpload(
