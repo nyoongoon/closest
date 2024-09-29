@@ -1,4 +1,4 @@
-package com.closest.www.api;
+package com.closest.www.api.example;
 
 
 public class Dto {

@@ -1,4 +1,4 @@
-package com.closest.www.api;
+package com.closest.www.api.example;
 
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;

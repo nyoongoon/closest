@@ -5,6 +5,7 @@ import org.apache.commons.text.translate.CharSequenceTranslator;
 import org.apache.commons.text.translate.LookupTranslator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
  */
 @Configuration
 public class XssConfiguration {
-
+    @ModelAttribute
     @Bean
     public CharSequenceTranslator charSequenceTranslator() {
         // 커스텀 이스케이프 설정

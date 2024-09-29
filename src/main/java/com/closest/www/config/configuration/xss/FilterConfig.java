@@ -25,58 +25,58 @@ public class FilterConfig {
         this.objectMapper = objectMapper;
         this.translator = translator;
     }
-
-    @Bean
-    public FilterRegistrationBean<XssFilter> xssFilterFilterRegistrationBean() {
-        FilterRegistrationBean<XssFilter> xssFilterFilterRegistrationBean = new FilterRegistrationBean<>(new XssFilter(translator));
-        xssFilterFilterRegistrationBean.setOrder(2);
-        return xssFilterFilterRegistrationBean;
-    }
-
-
-    /**
-     * application/x-www-form-urlencoded
-     * @return
-     */
-    @Bean
-    public FormHttpMessageConverter formUrlEncodedEscapeConverter() {
-        return new FormHttpMessageConverter() {
-            @Override
-            public MultiValueMap<String, String> read(Class<? extends MultiValueMap<String, ?>> clazz,
-                                                      HttpInputMessage inputMessage) throws IOException {
-                MultiValueMap<String, String> body = super.read(clazz, inputMessage);
-                return escapeMap(body);
-            }
-
-            private MultiValueMap<String, String> escapeMap(MultiValueMap<String, String> map) {
-                MultiValueMap<String, String> escapedMap = new LinkedMultiValueMap<>();
-                map.forEach((key, valueList) ->
-                        escapedMap.put(translator.translate(key),
-                                valueList.stream()
-                                        .map(translator::translate)
-                                        .collect(Collectors.toList()))
-                );
-                return escapedMap;
-            }
-        };
-    }
-
-
-    /**
-     * text/plain & multipart/form-data 문자열 파라미터
-     * @return
-     */
-    @Bean
-    public StringHttpMessageConverter textEscapeConverter() {
-        return new StringHttpMessageConverter() {
-            @Override
-            protected String readInternal(Class<? extends String> clazz, HttpInputMessage inputMessage)
-                    throws IOException {
-                String body = super.readInternal(clazz, inputMessage);
-                return translator.translate(body);
-            }
-        };
-    }
+//
+//    @Bean
+//    public FilterRegistrationBean<XssFilter> xssFilterFilterRegistrationBean() {
+//        FilterRegistrationBean<XssFilter> xssFilterFilterRegistrationBean = new FilterRegistrationBean<>(new XssFilter(translator));
+//        xssFilterFilterRegistrationBean.setOrder(2);
+//        return xssFilterFilterRegistrationBean;
+//    }
+//
+//
+//    /**
+//     * application/x-www-form-urlencoded
+//     * @return
+//     */
+//    @Bean
+//    public FormHttpMessageConverter formUrlEncodedEscapeConverter() {
+//        return new FormHttpMessageConverter() {
+//            @Override
+//            public MultiValueMap<String, String> read(Class<? extends MultiValueMap<String, ?>> clazz,
+//                                                      HttpInputMessage inputMessage) throws IOException {
+//                MultiValueMap<String, String> body = super.read(clazz, inputMessage);
+//                return escapeMap(body);
+//            }
+//
+//            private MultiValueMap<String, String> escapeMap(MultiValueMap<String, String> map) {
+//                MultiValueMap<String, String> escapedMap = new LinkedMultiValueMap<>();
+//                map.forEach((key, valueList) ->
+//                        escapedMap.put(translator.translate(key),
+//                                valueList.stream()
+//                                        .map(translator::translate)
+//                                        .collect(Collectors.toList()))
+//                );
+//                return escapedMap;
+//            }
+//        };
+//    }
+//
+//
+//    /**
+//     * text/plain & multipart/form-data 문자열 파라미터
+//     * @return
+//     */
+//    @Bean
+//    public StringHttpMessageConverter textEscapeConverter() {
+//        return new StringHttpMessageConverter() {
+//            @Override
+//            protected String readInternal(Class<? extends String> clazz, HttpInputMessage inputMessage)
+//                    throws IOException {
+//                String body = super.readInternal(clazz, inputMessage);
+//                return translator.translate(body);
+//            }
+//        };
+//    }
 
     /**
      * application/json & multipart/form-data 객체 파라미터

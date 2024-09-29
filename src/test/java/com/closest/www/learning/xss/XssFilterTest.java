@@ -130,10 +130,10 @@ class XssFilterTest {
 
     @DisplayName("application/json 문자열 이스케이프 테스트")
     @Test
-    public void testJson() throws Exception {
+    public void testJson() throws Exception {//todo jsonMessageConverter 직렬화만됨
         XssRequestDto dto = new XssRequestDto("<script>alert(1)</script>");
-        String json = objectMapper.writeValueAsString(dto);
-
+//        String json = objectMapper.writeValueAsString(dto);
+        String json = "{\"content\":\"<script>alert(1)</script>\"}";
         mockMvc.perform(post("/api/json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
