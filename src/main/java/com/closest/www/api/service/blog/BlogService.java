@@ -3,6 +3,7 @@ package com.closest.www.api.service.blog;
 import com.closest.www.api.controller.blog.response.BlogResponse;
 import com.closest.www.api.service.auth.exception.MemberNotFoundException;
 import com.closest.www.api.service.blog.exception.BlogNotFoundException;
+import com.closest.www.api.service.blog.request.AddBlogServiceRequest;
 import com.closest.www.domain.blog.Blog;
 import com.closest.www.domain.blog.BlogRepository;
 import com.closest.www.domain.feed.Feed;
@@ -40,9 +41,11 @@ public class BlogService {
     }
 
     @Transactional
-    public void memberSubscriptsBlog(String userEmail, URL url) {
-        Member member = memberRepository.findByUserEmail(userEmail)
+    public void memberSubscriptsBlog(AddBlogServiceRequest request) {
+        Member member = memberRepository.findByUserEmail(request.userEmail())
                 .orElseThrow(MemberNotFoundException::new);
+
+        URL url = request.url();
 
         Blog blog;
         if (blogRepository.existsByUrl(url)) {

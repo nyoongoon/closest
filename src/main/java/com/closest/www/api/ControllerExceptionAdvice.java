@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ControllerAdvice
 public class ControllerExceptionAdvice {
 
+    //todo ResponseEntity 사용하지 않아도 @ReponseBody로 나가는 것이므로 수정 필요..
     // @ResponseStatus(HttpStatus.BAD_REQUEST) -> ResponseEntity 사용하면서 삭제
     // -> HttpStatus를 에러 클래스에서 정의한 것으로 담기 위해 ResponseEntitiy 사용함
     @ExceptionHandler({AbstractException.class})

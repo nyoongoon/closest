@@ -3,7 +3,7 @@ package com.closest.www.api.service.auth.exception;
 import com.closest.www.api.AbstractException;
 import org.springframework.http.HttpStatus;
 
-import static com.closest.www.api.controller.auth.exception.AuthControllerExceptionMessageConstants.NOT_EQUAL_PASSWORDS;
+import static com.closest.www.api.controller.exception.ControllerExceptionMessageConstants.NOT_EQUAL_PASSWORDS;
 
 /**
  * 비빌번호, 확인 비밀번호 일치 판단 예외

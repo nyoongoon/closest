@@ -34,7 +34,7 @@ public class BindAnnotationTest{
         );
 
         // Multipart 요청을 사용하여 테스트 수행
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/submit")
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/bind")
                         .file(mockFile))
 //                        .with(csrf()))
                 .andDo(MockMvcResultHandlers.print())

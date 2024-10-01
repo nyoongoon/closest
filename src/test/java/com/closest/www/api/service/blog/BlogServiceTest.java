@@ -1,9 +1,12 @@
 package com.closest.www.api.service.blog;
 
 import com.closest.www.api.controller.blog.response.BlogResponse;
+import com.closest.www.api.service.blog.request.AddBlogServiceRequest;
 import com.closest.www.domain.blog.Blog;
 import com.closest.www.domain.blog.BlogRepository;
-import com.closest.www.domain.feed.*;
+import com.closest.www.domain.feed.Feed;
+import com.closest.www.domain.feed.FeedItem;
+import com.closest.www.domain.feed.FeedRepository;
 import com.closest.www.domain.feed.exception.FeedNotFoundException;
 import com.closest.www.domain.member.Member;
 import com.closest.www.domain.member.MemberRepository;
@@ -36,7 +39,7 @@ class BlogServiceTest {
     @Test
     @DisplayName("블로그 엔티티 등록하고 멤버, 구독 엔티티와 연관관계 맺는다")
     @Transactional
-    void test1() throws MalformedURLException {
+    void memberSubscriptsBlog() throws MalformedURLException {
         // given
         String userEmail = "abc@naver.com";
         Member member = Member.builder()
@@ -44,14 +47,21 @@ class BlogServiceTest {
                 .password("1234")
                 .build();
         memberRepository.save(member);
-        URL link = new URL("https://goalinnext.tistory.com/rss");
+
+        URL url = new URL("https://goalinnext.tistory.com/rss");
+
+        AddBlogServiceRequest request = new AddBlogServiceRequest(
+                userEmail,
+                url
+        );
+
         // when
-        blogService.memberSubscriptsBlog(userEmail, link);
+        blogService.memberSubscriptsBlog(request);
         // then
         Blog saved = member.getSubscriptions().get(0).getBlog();
-        Feed feed = feedRepository.findByUrl(link).orElseThrow(FeedNotFoundException::new);
+        Feed feed = feedRepository.findByUrl(url).orElseThrow(FeedNotFoundException::new);
         assertThat(saved.getAuthor()).isEqualTo(feed.getAuthor());
-        assertThat(saved.getUrl()).isEqualTo(link);
+        assertThat(saved.getUrl()).isEqualTo(url);
     }
 
     @Test
@@ -105,10 +115,12 @@ class BlogServiceTest {
                 .password("1234")
                 .build();
         memberRepository.save(member);
-        URL link1 = new URL("https://goalinnext.tistory.com/rss");
-        blogService.memberSubscriptsBlog(userEmail, link1);
-        URL link2 = new URL("https://jojoldu.tistory.com/rss");
-        blogService.memberSubscriptsBlog(userEmail, link2);
+        URL url1 = new URL("https://goalinnext.tistory.com/rss");
+        AddBlogServiceRequest request1 = new AddBlogServiceRequest(userEmail, url1);
+        blogService.memberSubscriptsBlog(request1);
+        URL url2 = new URL("https://jojoldu.tistory.com/rss");
+        AddBlogServiceRequest request2 = new AddBlogServiceRequest(userEmail, url2);
+        blogService.memberSubscriptsBlog(request2);
         //when
         List<BlogResponse> blogResponses = blogService.getBlogViewsByMember(member);
 

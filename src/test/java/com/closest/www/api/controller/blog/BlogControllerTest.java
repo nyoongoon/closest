@@ -1,72 +1,114 @@
 package com.closest.www.api.controller.blog;
 
-import com.closest.www.support.mock.MockUser;
 import com.closest.www.api.controller.blog.request.AddBlogRequest;
-import com.closest.www.domain.member.Member;
-import com.closest.www.domain.member.MemberRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.closest.www.support.ControllerTestSupport;
+import com.closest.www.support.mock.MockUser;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-class BlogControllerTest {
-    private static final Logger log = LoggerFactory.getLogger(BlogControllerTest.class);
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private MemberRepository memberRepository;
+@WebMvcTest
+class BlogControllerTest extends ControllerTestSupport {
 
+    @DisplayName("이메일과 링크로 유저에 블로그 추가 요청을 한다")
     @Test
     @MockUser()
-    @DisplayName("이메일과 링크로 유저에 블로그를 추가한다. ")
-    @Transactional
-    void test1() throws Exception {
+    void addBlog() throws Exception {
         // given
         String userEmail = "abc@naver.com";
-        Member member = Member.builder()
-                .userEmail(userEmail)
-                .password("1234")
-                .build();
-        memberRepository.save(member);
-        String link = "https://goalinnext.tistory.com";
+        String url = "https://goalinnext.tistory.com";
 
-        AddBlogRequest request = AddBlogRequest.of(
+        AddBlogRequest request = new AddBlogRequest(
                 userEmail,
-                new URL(link)
+                new URL(url)
         );
 
         String json = objectMapper.writeValueAsString(request);
 
         // expected
-        mockMvc.perform(post("/member-management/blog")
+        mockMvc.perform(post("/blog/add")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding(StandardCharsets.UTF_8)
                         .content(json))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
 
-        URL url = new URL(link);
-        Member foundMember = memberRepository.findByUserEmail(userEmail)
-                .orElseThrow();
-        foundMember.getSubscriptions().stream()
-                .filter(e -> e.getBlog().getUrl().equals(url))
-                .findAny()
-                .orElseThrow();
+    @DisplayName("블로그 추가 시 이메일이 null이면 에러가 발생한다.")
+    @Test
+    @MockUser()
+    void addBlogWithNullEmail() throws Exception {
+        // given
+        String userEmail = null;
+        String url = "https://goalinnext.tistory.com";
+
+        AddBlogRequest request = new AddBlogRequest(
+                userEmail,
+                new URL(url)
+        );
+
+        String json = objectMapper.writeValueAsString(request);
+
+        // expected
+        mockMvc.perform(post("/blog/add")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("이메일은 필수값입니다."));
+    }
+
+    /**
+     * 왜 안되지..? -> todo @Email이 정규식 안태우는지 확인..?
+     */
+    @DisplayName("블로그 추가 시 이메일 형식이 다르면 에러가 발생한다.")
+    @Test
+    @MockUser()
+    void addBlogWithWrongEmail() throws Exception {
+        // given
+        String json = "{\"userEmail\": \"invalid-email\", \"url\": \"http://valid-url.com\"}";
+
+        // expected
+        mockMvc.perform(post("/blog/add")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("올바른 이메일 형식이 아닙니다."));
+    }
+
+
+    @DisplayName("블로그 추가 시 url이 null이면 에러가 발생한다.")
+    @Test
+    @MockUser()
+    void addBlogWithNullUrl() throws Exception {
+        // given
+        String json = "{\"userEmail\" : \"abc@naver.com\", \"url\" : null }";
+
+        // expected
+        mockMvc.perform(post("/blog/add")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("400"))
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("URL은 필수값입니다."));
     }
 }

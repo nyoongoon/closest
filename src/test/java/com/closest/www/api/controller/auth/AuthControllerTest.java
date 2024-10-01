@@ -1,7 +1,6 @@
 package com.closest.www.api.controller.auth;
 
 import com.closest.www.api.service.auth.request.SignServiceRequest.SignUpServiceRequest;
-import com.closest.www.api.service.blog.exception.BlogNotFoundException;
 import com.closest.www.support.ControllerTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,9 +9,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import static com.closest.www.api.controller.auth.exception.AuthControllerExceptionMessageConstants.*;
+import static com.closest.www.api.controller.exception.ControllerExceptionMessageConstants.*;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignInRequest;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignUpRequest;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

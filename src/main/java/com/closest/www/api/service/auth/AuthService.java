@@ -78,19 +78,19 @@ public class AuthService {
         Member member = memberRepository.findByUserEmail(signInServiceRequest.userEmail())
                 .orElseThrow(MemberNotFoundException::new);
         // 패스워드 일치 여부
-        boolean isMatches = this.passwordEncoder.matches(signInServiceRequest.password(), member.getPassword());
+        boolean isMatches = passwordEncoder.matches(signInServiceRequest.password(), member.getPassword());
         if (!isMatches) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         // 토큰 Dto 생성
-        TokenDto tokenDto = this.jwtTokenProvider.getTokens(member.getUserEmail(), member.getRoles());
+        TokenDto tokenDto = jwtTokenProvider.getTokens(member.getUserEmail(), member.getRoles());
         // 리프레시 토큰 엔티티 생성 및 신규 저장
         Token refreshToken = Token.create(tokenDto.getUserEmail(), tokenDto.getRefreshToken());
         renewalToken(refreshToken);
 
         // 엑세스&리프레시 토큰 쿠키에 저장
-        this.jwtTokenProvider.addAccessTokenToCookie(response, tokenDto.getAccessToken());
-        this.jwtTokenProvider.addRefreshTokenToCookie(response, tokenDto.getRefreshToken());
+        jwtTokenProvider.addAccessTokenToCookie(response, tokenDto.getAccessToken());
+        jwtTokenProvider.addRefreshTokenToCookie(response, tokenDto.getRefreshToken());
     }
 
     private void renewalToken(Token token) {

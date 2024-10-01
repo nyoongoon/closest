@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class BindAnnotationController {
 
-    @PostMapping("/submit")
+    @PostMapping("/bind")
     public String handleFileUpload(@ModelAttribute("file") MultipartFile file,
                                    @ModelAttribute("dto") Dto dto
     ) {
