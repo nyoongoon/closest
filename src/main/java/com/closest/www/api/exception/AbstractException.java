@@ -1,4 +1,4 @@
-package com.closest.www.api;
+package com.closest.www.api.exception;
 
 
 import org.springframework.http.HttpStatus;

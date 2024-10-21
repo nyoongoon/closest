@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import static com.closest.www.utility.constant.Regex.PASSWORD;
-import static com.closest.www.api.controller.exception.ControllerExceptionMessageConstants.*;
+import static com.closest.www.api.exception.ExceptionMessageConstants.*;
 
 public record SignRequest() {
 

@@ -9,7 +9,7 @@ import com.closest.www.domain.feed.FeedItem;
 import com.closest.www.domain.feed.FeedRepository;
 import com.closest.www.domain.feed.exception.FeedNotFoundException;
 import com.closest.www.domain.member.Member;
-import com.closest.www.domain.member.MemberRepository;
+import com.closest.www.domain.member.MemberJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ class BlogServiceTest {
     @Autowired
     private BlogService blogService;
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberJpaRepository memberJpaRepository;
     @Autowired
     private FeedRepository feedRepository;
     @Autowired
@@ -46,7 +46,7 @@ class BlogServiceTest {
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
-        memberRepository.save(member);
+        memberJpaRepository.save(member);
 
         URL url = new URL("https://goalinnext.tistory.com/rss");
 
@@ -114,7 +114,7 @@ class BlogServiceTest {
                 .userEmail(userEmail)
                 .password("1234")
                 .build();
-        memberRepository.save(member);
+        memberJpaRepository.save(member);
         URL url1 = new URL("https://goalinnext.tistory.com/rss");
         AddBlogServiceRequest request1 = new AddBlogServiceRequest(userEmail, url1);
         blogService.memberSubscriptsBlog(request1);

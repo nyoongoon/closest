@@ -1,6 +1,6 @@
 package com.closest.www.api.service.blog.exception;
 
-import com.closest.www.api.AbstractException;
+import com.closest.www.api.exception.AbstractException;
 import org.springframework.http.HttpStatus;
 
 public class BlogNotFoundException extends AbstractException {

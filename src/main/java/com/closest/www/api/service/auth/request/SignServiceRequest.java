@@ -35,7 +35,6 @@ public record SignServiceRequest() {
                 return this;
             }
 
-
             public SignUpServiceRequest build() {
                 return new SignUpServiceRequest(userEmail, password, confirmPassword);
             }

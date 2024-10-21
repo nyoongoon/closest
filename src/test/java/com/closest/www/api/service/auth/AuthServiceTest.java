@@ -1,13 +1,11 @@
 package com.closest.www.api.service.auth;
 
-import com.closest.www.api.service.auth.exception.NotEqualPasswordsException;
-import com.closest.www.api.service.auth.request.SignServiceRequest;
 import com.closest.www.support.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.closest.www.api.service.auth.request.SignServiceRequest.*;
+import static com.closest.www.api.service.auth.request.SignServiceRequest.SignUpServiceRequest;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AuthServiceTest extends IntegrationTestSupport {
@@ -21,10 +19,10 @@ class AuthServiceTest extends IntegrationTestSupport {
         SignUpServiceRequest request  = SignUpServiceRequest.builder()
                 .userEmail("abc2@naver.com")
                 .password("wbho112@")
-                .password("Tbho112@")
+                .confirmPassword("Tbho112@")
                 .build();
         // expected
         assertThatThrownBy(() -> authService.signup(request))
-                .isInstanceOf(NotEqualPasswordsException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

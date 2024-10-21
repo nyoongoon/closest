@@ -1,7 +1,7 @@
 package com.closest.www.config.configuration.user;
 
 import com.closest.www.domain.member.Member;
-import com.closest.www.domain.member.MemberRepository;
+import com.closest.www.domain.member.MemberJpaRepository;
 import com.closest.www.domain.member.MemberUserDetailsRepositoryImpl;
 import com.closest.www.support.RepositoryTestSupport;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +22,7 @@ class MemberUserDetailsRepositoryImplTest extends RepositoryTestSupport {
     private MemberUserDetailsRepositoryImpl memberUserDetailsRepositoryImpl;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberJpaRepository memberJpaRepository;
 
     @DisplayName("username으로 Member의 userEmail과 일치하는 Member를 조회한 후, 인터페이스인 UserDetails 타입으로 리턴한다.")
     @Test
@@ -35,7 +35,7 @@ class MemberUserDetailsRepositoryImplTest extends RepositoryTestSupport {
                 .password(password)
                 .roles(List.of(ROLE_USER))
                 .build();
-        memberRepository.save(member);
+        memberJpaRepository.save(member);
 
         //when
         UserDetails found = memberUserDetailsRepositoryImpl.findByUsername(userEmail).orElseThrow();

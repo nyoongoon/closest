@@ -1,7 +1,6 @@
 package com.closest.www.api.service.blog;
 
 import com.closest.www.api.controller.blog.response.BlogResponse;
-import com.closest.www.api.service.auth.exception.MemberNotFoundException;
 import com.closest.www.api.service.blog.exception.BlogNotFoundException;
 import com.closest.www.api.service.blog.request.AddBlogServiceRequest;
 import com.closest.www.domain.blog.Blog;
@@ -11,7 +10,7 @@ import com.closest.www.domain.feed.FeedItem;
 import com.closest.www.domain.feed.FeedRepository;
 import com.closest.www.domain.feed.exception.FeedNotFoundException;
 import com.closest.www.domain.member.Member;
-import com.closest.www.domain.member.MemberRepository;
+import com.closest.www.domain.member.MemberJpaRepository;
 import com.closest.www.domain.post.Post;
 import com.closest.www.domain.post.PostRepository;
 import com.closest.www.domain.subscription.Subscription;
@@ -26,24 +25,25 @@ import java.util.List;
 
 @Service
 public class BlogService {
+
     private final FeedRepository feedRepository;
-    private final MemberRepository memberRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final BlogRepository blogRepository;
     private final PostRepository postRepository;
 
     public BlogService(FeedRepository feedRepository,
-                       MemberRepository memberRepository,
+                       MemberJpaRepository memberJpaRepository,
                        BlogRepository blogRepository, PostRepository postRepository) {
         this.feedRepository = feedRepository;
-        this.memberRepository = memberRepository;
+        this.memberJpaRepository = memberJpaRepository;
         this.blogRepository = blogRepository;
         this.postRepository = postRepository;
     }
 
     @Transactional
     public void memberSubscriptsBlog(AddBlogServiceRequest request) {
-        Member member = memberRepository.findByUserEmail(request.userEmail())
-                .orElseThrow(MemberNotFoundException::new);
+        Member member = memberJpaRepository.findByUserEmail(request.userEmail())
+                .orElseThrow(IllegalArgumentException::new);
 
         URL url = request.url();
 
@@ -77,8 +77,8 @@ public class BlogService {
         feedItems.stream()
                 .forEach(e -> Post.of(e.getTitle(), e.getUrl(), blog)); //Blog-Post 연관관계등록
 
-        Date lastPublishdDate = feed.getLastPublishdDate();
-        blog.updateLastPublishedDate(lastPublishdDate);
+//        Date lastPublishdDate = feed.getLastPublishdDate();
+//        blog.updateLastPublishedDate(lastPublishdDate);
         return blog;
     }
 
@@ -95,7 +95,7 @@ public class BlogService {
             Date lastPublishdDate = feed.getLastPublishdDate();
 
             //todo updated 로직 수정 필요..
-            boolean isUpdated = blog.isUpdated(lastPublishdDate);
+            boolean isUpdated = blog.isUpdated(null);
 
             blog = isUpdated ? putAllPostsOfBlog(blog, feed) : blog;
 

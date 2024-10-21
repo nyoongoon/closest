@@ -13,6 +13,7 @@ import static com.closest.www.domain.member.QMember.member;
 public class MemberUserDetailsRepositoryImpl implements UserDetailsRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
+
     public MemberUserDetailsRepositoryImpl(JPAQueryFactory jpaQueryFactory) {
         this.jpaQueryFactory = jpaQueryFactory;
     }

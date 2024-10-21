@@ -8,8 +8,8 @@ import jakarta.validation.constraints.NotNull;
 
 import java.net.URL;
 
-import static com.closest.www.api.controller.exception.ControllerExceptionMessageConstants.EMAIL_IS_REQUIRED;
-import static com.closest.www.api.controller.exception.ControllerExceptionMessageConstants.URL_IS_REQUIRED;
+import static com.closest.www.api.exception.ExceptionMessageConstants.EMAIL_IS_REQUIRED;
+import static com.closest.www.api.exception.ExceptionMessageConstants.URL_IS_REQUIRED;
 
 public record AddBlogRequest(
         @NotBlank(message = EMAIL_IS_REQUIRED)

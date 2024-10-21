@@ -1,5 +1,6 @@
-package com.closest.www.api;
+package com.closest.www.api.exception;
 
+import com.closest.www.api.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

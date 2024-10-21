@@ -1,5 +1,6 @@
 package com.closest.www.api.controller.blog;
 
+import com.closest.www.api.ApiResponse;
 import com.closest.www.api.controller.blog.request.AddBlogRequest;
 import com.closest.www.api.service.blog.BlogService;
 import jakarta.validation.Valid;
@@ -20,10 +21,10 @@ public class BlogController {
         this.blogService = blogService;
     }
 
-
     @PostMapping("/add")
     @PreAuthorize("hasRole('WRITE')")
-    public void addBlog(@RequestBody @Valid AddBlogRequest addBlogRequest) {
+    public ApiResponse<Void> addBlog(@RequestBody @Valid AddBlogRequest addBlogRequest) {
         blogService.memberSubscriptsBlog(addBlogRequest.toServiceRequest());
+        return ApiResponse.ok();
     }
 }

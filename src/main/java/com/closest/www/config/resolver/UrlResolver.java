@@ -9,7 +9,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import java.net.URL;
 
-import static com.closest.www.api.controller.exception.ControllerExceptionMessageConstants.URL_IS_REQUIRED;
+import static com.closest.www.api.exception.ExceptionMessageConstants.URL_IS_REQUIRED;
 
 /**
  * @see ResolveUrl

@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static com.closest.www.api.controller.exception.ControllerExceptionMessageConstants.*;
+import static com.closest.www.api.exception.ExceptionMessageConstants.*;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignInRequest;
 import static com.closest.www.api.controller.auth.request.SignRequest.SignUpRequest;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -5,6 +5,7 @@ import com.closest.www.domain.subscription.Subscription;
 import jakarta.persistence.*;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,7 +25,7 @@ public class Blog {
     private String author;
 
     @Column
-    private Date lastPublishedDate;
+    private LocalDate lastPublishedDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "blog")
     private List<Subscription> subscriptions = new ArrayList<>();
@@ -69,7 +70,7 @@ public class Blog {
         return author;
     }
 
-    public Date getLastPublishedDate() {
+    public LocalDate getLastPublishedDate() {
         return lastPublishedDate;
     }
 
@@ -81,12 +82,12 @@ public class Blog {
         return posts;
     }
 
-    public void updateLastPublishedDate(Date lastPublishedDate) {
+    public void updateLastPublishedDate(LocalDate lastPublishedDate) {
         this.lastPublishedDate = lastPublishedDate;
     }
 
     //todo 업데이트 여부 방식 바뀌어야함 (기존 날짜 타입이 LocalDatetime에서 Date로 변경됨- rss에서 Date로 주는 거 같음..)
-    public boolean isUpdated(Date lastPublishedDate) {
+    public boolean isUpdated(LocalDate lastPublishedDate) {
         return this.lastPublishedDate != lastPublishedDate;
     }
 
