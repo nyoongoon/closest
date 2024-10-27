@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@ResponseBody
+@ResponseBody //todo 불필요?
 @ControllerAdvice
 public class ControllerExceptionAdvice {
 

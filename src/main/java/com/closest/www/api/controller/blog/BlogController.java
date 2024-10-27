@@ -3,6 +3,7 @@ package com.closest.www.api.controller.blog;
 import com.closest.www.api.ApiResponse;
 import com.closest.www.api.controller.blog.request.AddBlogRequest;
 import com.closest.www.api.service.blog.BlogService;
+import com.closest.www.config.filter.JwtAuthenticationFilter;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
