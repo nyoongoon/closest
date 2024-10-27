@@ -20,23 +20,34 @@ paths:
       responses:
         '200':
           description: 구독한 블로그 정보 목록
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    intimacyRank:
+                      type: integer
+                      example: 2
+                    nickName:
+                      type: string
+                      example: "개발자123"
+                    url:
+                      type: string
+                      example: "https://example.com/blog1"
+                    newPostsCnt:
+                      type: integer
+                      example: 5
         '400':
-          description: 올바르지 못한 파라미터로 요청함
-    post:
-      tags:
-        - subscriptions
-      summary: 사용자는 특정 블로그에 구독 요청
-      parameters:
-        - in: query
-          name: url
-          required: true
-          schema:
-            type: string
-      responses:
-        '201': #201로 하는 것이 좋을지?
-          description: 구독 요청 완료
-        '400':
-          description: 올바르지 못한 객체로 요청함
+          description: 구독 정보가 존재하지 않음
+        '502':
+          description: RSS 서버 에러
+        '500':
+          description: 서버 에러
   /subscriptions/blogs/{blogId}:
     delete:
       tags:
